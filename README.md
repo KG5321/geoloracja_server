@@ -2,19 +2,19 @@
 
 Server created for team project called "GeoLoRacja"
 
-## Author
-
-- **Konrad Gebler**
-
-## Database:
-
-- PostrgreSQL
-
 ## Frameworks:
 
 - Flask
 - Bootstrap
 - SQLAlchemy
+
+## Database:
+
+- PostrgreSQL
+
+## Author
+
+- **Konrad Gebler**
 
 ## License
 
