@@ -1,3 +1,4 @@
+[![GeoLoRacja](https://lh3.googleusercontent.com/VNMxKUAxrDFsU8lKVBbJoLApU0PxyF_8hrFt6DyR-d0s8QyuQXI0LB7eH8Hm8jRfr0YfhSLEzO5qNPNHK5Zq=w1311-h670)](https://github.com/KG5321/geoloracja_server)
 # GeoLoRacja Server
 
 Server created for team project called "GeoLoRacja"
