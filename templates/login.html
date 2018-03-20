@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>Geoloracja Login</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='css/signin.css') }}" rel="stylesheet">
+  </head>
+</html>
+
+  <body class="text-center">
+    <form class="form-signin" action="/loginpost" method="POST">
+      <img class="mb-4" src="{{ url_for('static', filename='images/geoloracja_logo.png') }}" alt="Logo" width="113" height="72">
+      <h1 class="h3 mb-3 font-weight-normal">Zaloguj się do panelu użytkownika</h1>
+      <label for="inputEmail" class="sr-only">Email</label>
+      <input type="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus name="emailField">
+      <label for="inputPassword" class="sr-only">Hasło</label>
+      <input type="password" id="inputPassword" class="form-control" placeholder="Hasło" required name="passwordField">
+      <div class="checkbox mb-3">
+        <label>
+          <input type="checkbox" value="remember-me"> Zapamiętaj hasło
+        </label>
+      </div>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Zaloguj</button>
+      <p class="mt-5 mb-3 text-muted">&copy; Geoloracja 2018</p>
+    </form>
+  </body>
