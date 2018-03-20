@@ -6,13 +6,14 @@ Server created for team project called "GeoLoRacja"
 
 - **Konrad Gebler**
 
-## Database Info:
+## Database:
 
-- PostrgreSQL 10
+- PostrgreSQL
 
-## Libraries:
+## Frameworks:
 
 - Flask
+- Bootstrap
 - SQLAlchemy
 
 ## License
