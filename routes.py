@@ -6,7 +6,7 @@ from flask import render_template, request, url_for, redirect, session, flash, a
 @app.route('/', methods = ['GET'])
 def index():
     if not session.get('loggedIn'):
-        return render_template('index.html')
+        return render_template('main.html')
     else:
         return redirect(url_for('dashboard'))
 
@@ -29,7 +29,7 @@ def dashboard():
     else:
         return render_template('dashboard.html')
 
-@app.route("/logout")
+@app.route('/logout')
 def logout():
     session['loggedIn'] = False
     return redirect(url_for('index'))
