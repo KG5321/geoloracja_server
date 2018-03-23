@@ -4,18 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <title>Geoloracja Login</title>
+    <title>Geoloracja Rejestracja</title>
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/signin.css') }}" rel="stylesheet">
   </head>
-</html>
+
 
   <body class="text-center">
-    <form class="form-signin" action="/login" method="POST">
+    <form class="form-group col-lg-3 text-center" action="/register" method="POST">
       <img class="mb-4" src="{{ url_for('static', filename='images/geoloracja_logo.png') }}" alt="Logo" width="113" height="72">
-      <h1 class="h3 mb-3 font-weight-normal">Zaloguj się do panelu użytkownika</h1>
+      <h1 class="h3 mb-3 font-weight-normal">Zarejestruj się w systemie Geoloracja</h1>
       {% with messages = get_flashed_messages() %}
           {% if messages %}
             <ul class=flashes style="margin-top:20px">
@@ -34,20 +32,24 @@
           {% endif %}
         {% endwith %}
       {% block body %}{% endblock %}
+      <label for="inputName" class="sr-only">Imię</label>
+      <input type="text" id="inputName" class="form-control" placeholder="Imię" required autofocus name="nameField" style="margin-top:5px">
+      <label for="inputSurname" class="sr-only">Nazwisko</label>
+      <input type="text" id="inputSurname" class="form-control" placeholder="Nazwisko" required autofocus name="surnameField" style="margin-top:5px">
       <label for="inputEmail" class="sr-only">Email</label>
-      <input type="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus name="emailField">
+      <input type="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus name="emailField" style="margin-top:5px">
       <label for="inputPassword" class="sr-only">Hasło</label>
-      <input type="password" id="inputPassword" class="form-control" placeholder="Hasło" required name="passwordField">
-      <div class="checkbox mb-3">
-        <label>
-          <input type="checkbox" value="remember-me"> Zapamiętaj hasło
-        </label>
-      </div>
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Zaloguj</button>
+      <input type="password" id="inputPassword" class="form-control" placeholder="Hasło" required autofocus name="passwordField" style="margin-top:5px">
+      <label for="inputPassword2" class="sr-only">Powtórz hasło</label>
+      <input type="password" id="inputPassword2" class="form-control" placeholder="Powtórz hasło" required autofocus name="password2Field" style="margin-top:5px">
+      <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin-top:10px">Zarejestruj</button>
       <p class="mt-5 mb-3 text-muted">&copy; Geoloracja 2018</p>
     </form>
+
+
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='js/jquery-slim.min.js') }}"><\/script>')</script>
     <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   </body>
+</html>
