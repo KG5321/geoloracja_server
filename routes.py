@@ -14,20 +14,23 @@ class Lora(Thread):
     def __init__(self):
         self.delay = 1
         super(Lora, self).__init__()
-    def lora_listener(self):
 
-        handler = ttn.HandlerClient(app_id, access_key)
+    def lora_listener(self):
         print("Started listening...")
+        app_id = "geoloracja"
+        access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
+        handler = ttn.HandlerClient(app_id, access_key)
         while not thread_stop_event.isSet():
+            print("Loop is working")
             mqtt_client = handler.data()
-            mqtt_client.set_uplink_callback(uplink_callback)
+            mqtt_client.set_uplink_callback(self.uplink_callback)
             mqtt_client.connect()
             sleep(self.delay)
             mqtt_client.close()
 
     def uplink_callback(msg, client):
-        print("test "+msg)
-        socketio.emit('newMsg', {'msg' : msg}, namespace='/test')
+        print("test")
+        socketio.emit('connect', {'msg' : msg})
 
     def run(self):
         self.lora_listener()
@@ -41,16 +44,16 @@ def index():
     else:
         return redirect(url_for('dashboard'))
 
-@socketio.on('connect', namespace='/test')
+@socketio.on('connect')
 def test_connect():
     global thread
     print('Client connected')
     if not thread.isAlive():
         print("Starting thread")
         thread = Lora()
-        thread.start
+        thread.start()
 
-@socketio.on('disconnect', namespace='/test')
+@socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected')
 
