@@ -30,7 +30,7 @@ class Lora(Thread):
 
     def uplink_callback(self, msg, client):
         print("test", msg)
-        socketio.emit('abc', msg)
+        socketio.emit('abc', {'msg': msg})
 
     def run(self):
         self.lora_listener()
