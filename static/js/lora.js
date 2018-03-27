@@ -1,10 +1,10 @@
 $(document).ready(function(){
     //connect to the socket server.
-    var socket = io.connect('http://localhost:5000');
+    var socket = io.connect('http://' + document.domain + ':5000');
     var numbers_received = [];
 
     //receive details from server
-    socket.on('newMsg', function(msg) {
+    socket.on('connect', function(msg) {
         console.log("Received message" + msg);
         //maintain a list of ten numbers
         if (numbers_received.length >= 10){
