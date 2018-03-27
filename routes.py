@@ -29,8 +29,8 @@ class Lora(Thread):
             mqtt_client.close()
 
     def uplink_callback(self, msg, client):
-        print("test")
-        socketio.emit('connect', {'msg' : msg})
+        print("test", msg)
+        socketio.emit('abc', msg)
 
     def run(self):
         self.lora_listener()

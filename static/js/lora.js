@@ -4,8 +4,8 @@ $(document).ready(function(){
     var numbers_received = [];
 
     //receive details from server
-    socket.on('connect', function(msg) {
-        console.log("Received message" + msg);
+    socket.on('abc', function(msg) {
+        console.log("Received message: " + msg);
         //maintain a list of ten numbers
         if (numbers_received.length >= 10){
             numbers_received.shift()
