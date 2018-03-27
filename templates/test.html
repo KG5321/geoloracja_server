@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/lora.js') }}"></script>
+
+
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="jumbotron">
+    <h1>Lora messages monitor</h1>
+</div>
+
+<div class="container" id="content">
+    <div class="row">
+        <p>Recived messages will appear here:</p>
+        <h3>Message list:</h3>
+        <div id="log">
+    </div>
+</div>
+
+
+</div>
+
+</body>
+</html>

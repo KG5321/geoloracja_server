@@ -31,6 +31,24 @@
   <div class="jumbotron jumbotron-fluid">
     <div class="container">
       <h1 class="display-4">Tutaj będzie panel użytkownika</h1>
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes style="margin-top:20px">
+              {% for message in messages %}
+              <div class="container-fluid">
+                  <div class="row">
+                      <div class="col-md-10 col-md-offset-5">
+                          <div class="alert alert-danger text-center" role="alert">
+                              {{ message }}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+      {% block body %}{% endblock %}
     </div>
   </div>
 

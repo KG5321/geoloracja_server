@@ -1,8 +1,38 @@
 # coding: utf-8
-from server import app, db
+from server import app, db, socketio
 from models import User
 from flask import render_template, request, url_for, redirect, session, flash, abort
 from sqlalchemy import exc
+from threading import Thread, Event
+import ttn
+from time import sleep
+
+thread = Thread()
+thread_stop_event = Event()
+
+class Lora(Thread):
+    def __init__(self):
+        self.delay = 1
+        super(Lora, self).__init__()
+    def lora_listener(self):
+
+        handler = ttn.HandlerClient(app_id, access_key)
+        print("Started listening...")
+        while not thread_stop_event.isSet():
+            mqtt_client = handler.data()
+            mqtt_client.set_uplink_callback(uplink_callback)
+            mqtt_client.connect()
+            sleep(self.delay)
+            mqtt_client.close()
+
+    def uplink_callback(msg, client):
+        print("test "+msg)
+        socketio.emit('newMsg', {'msg' : msg}, namespace='/test')
+
+    def run(self):
+        self.lora_listener()
+
+
 
 @app.route('/', methods = ['GET'])
 def index():
@@ -10,6 +40,19 @@ def index():
         return render_template('main.html')
     else:
         return redirect(url_for('dashboard'))
+
+@socketio.on('connect', namespace='/test')
+def test_connect():
+    global thread
+    print('Client connected')
+    if not thread.isAlive():
+        print("Starting thread")
+        thread = Lora()
+        thread.start
+
+@socketio.on('disconnect', namespace='/test')
+def test_disconnect():
+    print('Client disconnected')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -23,11 +66,14 @@ def login():
         return redirect(url_for('login'))
     if findUser.is_correct_password(password):
         session['loggedIn'] = True
-        session['currentUserId'] = findUser.get_user_id()
+        session['currentUserId'] = findUser.id
         return redirect(url_for('dashboard'))
     flash(u'Dane są niepoprawne. Spróbuj jeszcze raz.')
     return redirect(url_for('login'))
 
+@app.route('/testing')
+def testing():
+    return render_template('test.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -56,6 +102,7 @@ def dashboard():
         return redirect(url_for('login'))
     else:
         currentUser = User.query.get(session['currentUserId'])
+        print('Current user: '+currentUser.name+' '+currentUser.surname)
         return render_template('dashboard.html')
 
 @app.route('/logout')

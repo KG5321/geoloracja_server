@@ -1,5 +1,6 @@
 from server import db, bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+import time
 
 class User(db.Model):
 
@@ -26,15 +27,38 @@ class User(db.Model):
     def is_correct_password(self, plaintext_password):
         return bcrypt.check_password_hash(self.passwordHash, plaintext_password)
 
-    def get_user_id(self):
-        return self.id
-
 
 
 
 class Device(db.Model):
-    id = db.Column(db.String(50), primary_key = True)
-    name = db.Column(db.String(50))
-    ownerId = db.Column(db.Integer)
+
+    __tablename__ = 'devices'
+
+    id = db.Column(db.Integer, primary_key = True)
+    deviceAddress = db.Column(db.String)
+    name = db.Column(db.String)
     currentLat = db.Column(db.Float)
     currentLng = db.Column(db.Float)
+    lastUpdate = db.Column(db.Date)
+
+    def __init__(self, deviceAddress, name):
+        self.deviceAddress = deviceAddress
+        self.name = name
+
+
+    def set_location(self, currentLat, currentLng):
+        self.currentLat = currentLat
+        self.currentLng = currentLng
+        self.lastUpdate = time.currentUTC()
+
+class UserDevice(db.Model):
+
+    __tablename__ = 'userDevice'
+
+    id = db.Column(db.Integer, primary_key=True)
+    deviceId = db.Column(db.Integer)
+    userId = db.Column(db.Integer)
+
+    def __init__(self,deviceId, userId):
+        self.deviceId = deviceId
+        self.userId = userId
