@@ -12,7 +12,7 @@ thread_stop_event = Event()
 
 class Lora(Thread):
     def __init__(self):
-        self.delay = 1
+        self.delay = 10
         super(Lora, self).__init__()
 
     def lora_listener(self):
@@ -28,7 +28,7 @@ class Lora(Thread):
             sleep(self.delay)
             mqtt_client.close()
 
-    def uplink_callback(msg, client):
+    def uplink_callback(self, msg, client):
         print("test")
         socketio.emit('connect', {'msg' : msg})
 
