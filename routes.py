@@ -12,7 +12,7 @@ thread_stop_event = Event()
 
 class Lora(Thread):
     def __init__(self):
-        self.delay = 10
+        self.delay = 5
         super(Lora, self).__init__()
 
     def lora_listener(self):
@@ -29,8 +29,8 @@ class Lora(Thread):
             mqtt_client.close()
 
     def uplink_callback(self, msg, client):
-        print("test", msg.dev_id)
-        socketio.emit('abc', {'msg': msg})
+        print(msg.payload_fields)
+        socketio.emit('abc', {'msg': msg.payload_fields})
 
     def run(self):
         self.lora_listener()
@@ -82,7 +82,6 @@ def testing():
 def register():
     if request.method == 'GET':
         return render_template('register.html')
-    print(request.form['passwordField'])
     if request.form['passwordField'] == request.form['password2Field']:
         newUser = User(request.form['nameField'], request.form['surnameField'], request.form['emailField'], request.form['passwordField'], False)
         try:
@@ -107,6 +106,10 @@ def dashboard():
         currentUser = User.query.get(session['currentUserId'])
         print('Current user: '+currentUser.name+' '+currentUser.surname)
         return render_template('dashboard.html')
+
+@app.route('/myprofile', methods=['GET'])
+def myprofile():
+    return render_template('myprofile.html')
 
 @app.route('/logout')
 def logout():

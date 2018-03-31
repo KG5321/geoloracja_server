@@ -24,13 +24,13 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
+        <li class="nav-item">
           <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Moje urządzenia</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item active">
           <a class="nav-link" href="{{ url_for('myprofile') }}">Mój profil</a>
         </li>
       </ul>
@@ -50,13 +50,13 @@
              <li class="nav-item">
                <a class="nav-link active" href="#">
                  <span data-feather="home"></span>
-                 Mapa <span class="sr-only">(current)</span>
+                 Profil <span class="sr-only">(current)</span>
                </a>
              </li>
              <li class="nav-item">
                <a class="nav-link" href="#">
                  <span data-feather="file"></span>
-                 Zaznacz obszar
+                 Edytuj profil
                </a>
              </li>
            </ul>
@@ -98,58 +98,14 @@
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 
-  <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%px;
-      }
-    </style>
 
   <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3">
-            <div id="map" style="height:700px; margin-top: 4rem;"></div>
-              <script>
-                var map;
-                function initMap() {
-                  map = new google.maps.Map(document.getElementById('map'), {
-                    center: {lat: 51.108860, lng: 17.050860},
-                    zoom: 13,
-                    disableDefaultUI: true,
-                    zoomControl: true,
-                    gestureHandling: 'cooperative'
-                  });
-                  var drawingManager = new google.maps.drawing.DrawingManager({
-                      drawingMode: google.maps.drawing.OverlayType.POLYGON,
-                      drawingControl: true,
-                      drawingControlOptions: {
-                        position: google.maps.ControlPosition.TOP_CENTER,
-                        drawingModes: ['polygon', 'circle']
-                      },
-                      markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
-                      circleOptions: {
-                        fillColor: '#404040',
-                        fillOpacity: 0.4,
-                        strokeWeight: 5,
-                        clickable: false,
-                        editable: true,
-                        zIndex: 1
-                      }
-                    });
-                  drawingManager.setMap(map);
-                  map.disableScrollWheelZoom();
-                }
-              </script>
-              <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaw3kCuHb1rRCMMMkxxsmpLB8kRwIKSfs&callback=initMap&libraries=drawing"
-              async defer></script>
-
-
-            <!-- <div class="jumbotron jumbotron-fluid">
+            <div class="jumbotron jumbotron-fluid">
               <div class="container">
-                <h1 class="display-4">Tu będzie mapa</h1>
-                <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+                <h1 class="display-4">Tu będzie mój profil</h1>
               </div>
-            </div> -->
+            </div>
 
           </div>
       {% with messages = get_flashed_messages() %}
