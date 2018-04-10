@@ -2,6 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_socketio import SocketIO, emit
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
 
 
 
@@ -10,7 +12,8 @@ app.config.from_pyfile('config.py')
 socketio = SocketIO(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-
+mail = Mail(app)
+serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 
 from routes import *

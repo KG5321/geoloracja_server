@@ -12,13 +12,15 @@ class User(db.Model):
     email = db.Column(db.String, unique=True)
     passwordHash = db.Column(db.Binary(60))
     isAdmin = db.Column(db.Boolean, default=False)
+    isEmailVerified = db.Column(db.Boolean, default=False)
 
-    def __init__(self, name, surname, email, plaintext_password, isAdmin):
+    def __init__(self, name, surname, email, plaintext_password, isAdmin, isEmailVerified):
         self.name = name
         self.surname = surname
         self.email = email
         self.passwordHash = self.set_password(plaintext_password)
         self.isAdmin = isAdmin
+        self.isEmailVerified = isEmailVerified
 
 
     def set_password(self, plaintext_password):

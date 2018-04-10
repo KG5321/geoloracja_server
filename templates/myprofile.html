@@ -28,7 +28,7 @@
           <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Moje urządzenia</a>
+          <a class="nav-link" href="{{ url_for('mydevices') }}">Moje urządzenia</a>
         </li>
         <li class="nav-item active">
           <a class="nav-link" href="{{ url_for('myprofile') }}">Mój profil</a>
@@ -61,7 +61,7 @@
              </li>
            </ul>
 
-           <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+           <!-- <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
              <span>Saved reports</span>
              <a class="d-flex align-items-center text-muted" href="#">
                <span data-feather="plus-circle"></span>
@@ -92,20 +92,65 @@
                  Year-end sale
                </a>
              </li>
-           </ul>
+           </ul> -->
          </div>
        </nav>
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 
 
-  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4"style="margin-top: 4rem;">
           <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3">
-            <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+                    <div class="row">
+                            <div class="col-md-4">
+                                <img src="static/images/jan.jpg" id="zdjecie"  class="img-thumbnail"  onclick="zdjecie()">
+                                <label class="btn btn-block btn-primary">
+                                    Zmień Zdjęcie <input type="file" style="display: none;" id="zdjecie"></label>
+                            </div>
+                        <form>
+                            <div class="col-md-9">
+                                <div class="form-grup">
+                                <div class="mb-3">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                            <span class="input-group-text">Imię</span>
+                                        <input type="text" class="form-control" id="name" placeholder="Imię"  disabled>
+                                        <span class="input-group-text">Nazwisko</span>
+                                        <input type="text" class="form-control" id="surname" placeholder="Nazwisko"  disabled>
+              </div>
+            </div>
+
+                                    <div class="mb-3">
+                                         <div class="input-group-prepend">
+                                    <span class="input-group-text">E-mail</span><input type="email" class="form-control" id="email" placeholder="you@example.com" disabled>
+                                    </div>
+                                         </div>
+                                    <div class="mb-3">
+                                         <div class="input-group-prepend">
+                                    <input type="button" class="btn btn-primary btn-block" id="haslo" value="Resetuj Hasło" disabled>
+                                    </div>
+                                         </div>
+                                </div>
+                            </div>
+                    </div>
+                        </form>
+                </div>
+
+          </div>
+                 <div class="container">
+                     <hr class="mb-4">
+                <input class="btn btn-primary btn-lg btn-block" type="submit" onclick="butons()"  value="Edytuj" id="buton">
+                </div>
+
+
+
+
+            <!-- <div class="jumbotron jumbotron-fluid">
               <div class="container">
                 <h1 class="display-4">Tu będzie mój profil</h1>
               </div>
-            </div>
+            </div> -->
 
           </div>
       {% with messages = get_flashed_messages() %}
