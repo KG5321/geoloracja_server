@@ -163,7 +163,7 @@ class Lora(Thread):
     def run(self):
         self.lora_listener()
 
-#Test routes
+#Test routes test 123
 
 # @app.route('/testmail', methods=['GET'])
 # def testmail():
@@ -174,7 +174,7 @@ class Lora(Thread):
 
 # @app.route('/makeadmin')
 # def makeadmin():
-#     user = User.query.get(session['currentUserId'])
-#     user.isAdmin = True
-#     db.session.commit()
-#     return 'You\'re admin now!'
+#    user = User.query.get(session['currentUserId'])
+#    user.isAdmin = True
+#    db.session.commit()
+#    return 'You\'re admin now!'
