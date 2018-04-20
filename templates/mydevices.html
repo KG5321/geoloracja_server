@@ -36,7 +36,7 @@
         </li>
       </ul>
       <form class="form-inline my-2 my-lg-0">
-        <a class="btn btn-success my-2 my-sm-0" href="index.html">Wyloguj</a>
+        <a class="btn btn-success my-2 my-sm-0" href="{{ url_for('logout') }}">Wyloguj</a>
       </form>
     </div>
   </nav>
@@ -110,6 +110,7 @@
                   <th>Nazwa</th>
                   <th>Adres Urządzenia</th>
                   <th>Czas ostatniej aktualizacji</th>
+                  <th>Edycja</th>
                 </tr>
               </thead>
                 <tbody>
@@ -118,6 +119,7 @@
                   <td>Nazwa</td>
                   <td>Adres Urządzenia</td>
                   <td>Czas ostatniej aktualizacji</td>
+                  <td><a class="btn btn-success" href="{{ url_for('dashboard') }}" style="padding: 0.5% 0; width: 70px">Edytuj</a></td>
                 </tr>
                 </tbody>
             </table>
