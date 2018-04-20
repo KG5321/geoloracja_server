@@ -100,6 +100,7 @@
        </nav>
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/ui.js') }}"></script>
 
   <style>
       /* Always set the map height explicitly to define the size of the div
@@ -114,7 +115,7 @@
             <h1 class="h2">Lista Urządzeń</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
               <div class="btn-group mr-2">
-                <button class="btn btn-sm btn-outline-secondary">Addevice</button>
+                <a class="btn btn-sm btn-outline-secondary " href="#">Addevice</a>
               </div>
               <form class="form-inline mt-2 mt-md-0">
             <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
@@ -135,16 +136,20 @@
                 </tr>
               </thead>
               <tbody>
+
                 <tr>
-		  <form>
+
+		  <form id="form1">
                      <td><input type="text" class="form-control" id="inputID" value = "inputID" disabled></td>
                      <td><input type="text" class="form-control" id="inputName" value = "inputName" disabled></td>
                      <td><input type="text" class="form-control" id="inputOpiekun" value = "inputOpiekun" disabled></td>
                      <td><input type="text" class="form-control" id="inputAdres" value = "inputAdres" disabled></td>
 		     <td><input type="data" class="form-control" id="inputUpdate" value = "inputUpdate" disabled></td>
-                     <td><input type="button" class="btn btn-primary btn-block" id="edButton" value="Edytuj" ></td>
+                     <td><input type="button" class="btn btn-primary btn-block" id="edButton" value="Edytuj" onclick='disenableDevUs("form1")'></td>
 		  </form>
+
                 </tr>
+
               </tbody>
             </table>
           </div>

@@ -97,7 +97,7 @@
        </nav>
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-
+  <script type="text/javascript" src="{{ url_for('static', filename='js/ui.js') }}"></script>
 
   <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4"style="margin-top: 4rem;">
           <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3">
@@ -108,7 +108,7 @@
                                 <label class="btn btn-block btn-primary">
                                     Zmień Zdjęcie <input type="file" style="display: none;" id="zdjecie"></label>
                             </div>
-                        <form>
+                        <form id="formMyprofile">
                             <div class="col-md-9">
                                 <div class="form-grup">
                                 <div class="mb-3">
@@ -140,7 +140,7 @@
           </div>
                  <div class="container">
                      <hr class="mb-4">
-                <input class="btn btn-primary btn-lg btn-block" type="submit" onclick="butons()"  value="Edytuj" id="buton">
+                <input class="btn btn-primary btn-lg btn-block" type="submit" onclick='disenableMyProfile("formMyprofile")'  value="Edytuj" id="buton">
                 </div>
 
 

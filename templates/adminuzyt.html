@@ -100,6 +100,7 @@
        </nav>
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/ui.js') }}"></script>
 
   <style>
       /* Always set the map height explicitly to define the size of the div
@@ -134,7 +135,7 @@
               <tbody>
 
                 <tr>
-		  <form>
+		  <form id="form1">
                      <td><input type="text" class="form-control" id="inputID" value = "inputID" disabled></td>
                      <td><input type="text" class="form-control" id="inputName" value = "inputName" disabled></td>
                      <td><input type="text" class="form-control" id="inputSurname" value = "inputSurname" disabled></td>
@@ -143,7 +144,7 @@
       				<option>Tak</option>
       				<option>Nie</option>
     				</select></td>
-                     <td><input type="button" class="btn btn-primary btn-block" id="edButton" value="Edytuj" ></td>
+                     <td><input type="button" class="btn btn-primary btn-block" id="edButton" value="Edytuj" onclick='disenableDevUs("form1")' ></td>
 		  </form>
                 </tr>
 
