@@ -1,11 +1,11 @@
 # coding: utf-8
 from server import app, db, socketio, mail, serializer
 from flask_mail import Message
-from models import User
+from models import User, Device
 from flask import render_template, request, url_for, redirect, session, flash, abort
 from sqlalchemy import exc
 from threading import Thread, Event
-import ttn
+import ttn, itsdangerous
 from time import sleep
 
 
@@ -99,13 +99,43 @@ def confirm_email(token):
     db.session.commit()
     return redirect(url_for('login'))
 
+@app.route('/passwordreset/<token>')
+def password_reset(token):
+    try:
+        email = serializer.loads(token, salt='password-reset')
+    except itsdangerous.BadSignature:
+        return '<h1>Błędny token</h1>'
+    return '<h1>Works</h1>'
+
 
 @app.route('/mydevices', methods=['GET'])
 def mydevices():
     if not session.get('loggedIn'):
         return redirect(url_for('login'))
     else:
-        return render_template('mydevices.html')
+        currentUser = User.query.get(session['currentUserId'])
+        devices = currentUser.device
+        return render_template('mydevices.html', devices=devices)
+
+@app.route('/newdevice', methods=['GET', 'POST'])
+def newdevice():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        if request.method == 'GET':
+            return render_template('newdevice.html')
+        deviceName = request.form['deviceNameField']
+        deviceAddress = request.form['deviceAddressField']
+        currentUser = User.query.get(session['currentUserId'])
+        if deviceName and deviceAddress:
+            newDevice = Device(deviceAddress,deviceName)
+            db.session.add(newDevice)
+            currentUser.device.append(newDevice)
+            db.session.commit()
+            return redirect(url_for('mydevices'))
+        else:
+            flash(u'Pola nie zostały wypełnione')
+            return render_template('newdevice.html')
 
 
 @app.route('/dashboard', methods=['GET'])
@@ -123,7 +153,12 @@ def myprofile():
     if not session.get('loggedIn'):
         return redirect(url_for('login'))
     else:
-        return render_template('myprofile.html')
+        currentUser = User.query.get(session['currentUserId'])
+        details = {}
+        details['name'] = currentUser.name
+        details['surname'] = currentUser.surname
+        details['email'] = currentUser.email
+        return render_template('myprofile.html', details=details)
 
 @app.route('/logout')
 def logout():
@@ -133,6 +168,10 @@ def logout():
         session['loggedIn'] = False
         session['currentUserId'] = None
         return redirect(url_for('index'))
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 #Thread for getting live messages from devices
 

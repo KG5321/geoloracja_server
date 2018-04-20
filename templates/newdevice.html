@@ -49,13 +49,13 @@
          <div class="sidebar-sticky">
            <ul class="nav flex-column">
              <li class="nav-item">
-               <a class="nav-link active" href="{{ url_for('mydevices') }}">
+               <a class="nav-link" href="{{ url_for('mydevices') }}">
                  <span data-feather="home"></span>
                  Moje urządzenia <span class="sr-only">(current)</span>
                </a>
              </li>
              <li class="nav-item">
-               <a class="nav-link" href="{{ url_for('newdevice') }}">
+               <a class="nav-link active" href="{{ url_for('newdevice') }}">
                  <span data-feather="file"></span>
                  Nowe urządzenie
                </a>
@@ -101,36 +101,11 @@
 
 
   <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" style="margin-top: 4rem;">
-      <h2>Lista Urządzeń</h2>
-          <div class="table-responsive">
-            <table class="table table-striped table-sm">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Nazwa</th>
-                  <th>Adres Urządzenia</th>
-                  <th>Czas ostatniej aktualizacji</th>
-                  <th>Edycja</th>
-                </tr>
-              </thead>
-                <tbody>
-
-                  {% for device in devices %}
-                  <tr>
-                      <td>{{device.id}}</td>
-                      <td>{{device.name}}</td>
-                      <td>{{device.deviceAddress}}</td>
-                      <td>{{device.lastUpdate}}</td>
-                      <td><a class="btn btn-success" href="{{ url_for('dashboard') }}" style="padding: 0.5% 0; width: 70px">Edytuj</a></td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-            </table>
-          </div>
-         </main>
+      <h2>Nowe urządzenie</h2>
+      <hr class="my-4">
       {% with messages = get_flashed_messages() %}
           {% if messages %}
-            <ul class=flashes style="margin-top:20px">
+            <ul class=flashes>
               {% for message in messages %}
               <div class="container-fluid">
                   <div class="row">
@@ -146,6 +121,19 @@
           {% endif %}
         {% endwith %}
       {% block body %}{% endblock %}
+        <form action="/newdevice" method="POST">
+          <div class="form-group">
+            <label for="deviceName">Nazwa urządzenia</label>
+            <input type="text" class="form-control" id="deviceName" name="deviceNameField" placeholder="Nazwa urządzenia">
+          </div>
+          <div class="form-group">
+            <label for="deviceAddress">Adres urządzenia</label>
+            <input type="text" class="form-control" id="deviceAddress" name="deviceAddressField" placeholder="Adres urządzenia">
+          </div>
+          <button type="submit" class="btn btn-success">Dodaj urządzenie</button>
+        </form>
+         </main>
+
     </div>
   </div>
 

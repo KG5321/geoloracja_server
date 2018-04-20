@@ -2,6 +2,11 @@ from server import db, bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 import time
 
+userDevice = db.Table('userDevice',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('device_id', db.Integer, db.ForeignKey('devices.id'))
+)
+
 class User(db.Model):
 
     __tablename__ = 'users'
@@ -13,6 +18,7 @@ class User(db.Model):
     passwordHash = db.Column(db.Binary(60))
     isAdmin = db.Column(db.Boolean, default=False)
     isEmailVerified = db.Column(db.Boolean, default=False)
+
 
     def __init__(self, name, surname, email, plaintext_password, isAdmin, isEmailVerified):
         self.name = name
@@ -41,7 +47,8 @@ class Device(db.Model):
     name = db.Column(db.String)
     currentLat = db.Column(db.Float)
     currentLng = db.Column(db.Float)
-    lastUpdate = db.Column(db.Date)
+    lastUpdate = db.Column(db.DateTime)
+    users = db.relationship('User', secondary=userDevice, backref=db.backref('device', lazy='dynamic'))
 
     def __init__(self, deviceAddress, name):
         self.deviceAddress = deviceAddress
@@ -52,15 +59,3 @@ class Device(db.Model):
         self.currentLat = currentLat
         self.currentLng = currentLng
         self.lastUpdate = time.currentUTC()
-
-class UserDevice(db.Model):
-
-    __tablename__ = 'userDevice'
-
-    id = db.Column(db.Integer, primary_key=True)
-    deviceId = db.Column(db.Integer)
-    userId = db.Column(db.Integer)
-
-    def __init__(self,deviceId, userId):
-        self.deviceId = deviceId
-        self.userId = userId

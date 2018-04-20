@@ -99,60 +99,12 @@
   <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 
 
-  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4"style="margin-top: 4rem;">
-          <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3">
-            <div class="container">
-                    <div class="row">
-                            <div class="col-md-4">
-                                <img src="static/images/jan.jpg" id="zdjecie"  class="img-thumbnail"  onclick="zdjecie()">
-                                <label class="btn btn-block btn-primary">
-                                    Zmień Zdjęcie <input type="file" style="display: none;" id="zdjecie"></label>
-                            </div>
-                        <form>
-                            <div class="col-md-9">
-                                <div class="form-grup">
-                                <div class="mb-3">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                            <span class="input-group-text">Imię</span>
-                                        <input type="text" class="form-control" id="name" placeholder="Imię"  disabled>
-                                        <span class="input-group-text">Nazwisko</span>
-                                        <input type="text" class="form-control" id="surname" placeholder="Nazwisko"  disabled>
-              </div>
-            </div>
-
-                                    <div class="mb-3">
-                                         <div class="input-group-prepend">
-                                    <span class="input-group-text">E-mail</span><input type="email" class="form-control" id="email" placeholder="you@example.com" disabled>
-                                    </div>
-                                         </div>
-                                    <div class="mb-3">
-                                         <div class="input-group-prepend">
-                                    <input type="button" class="btn btn-primary btn-block" id="haslo" value="Resetuj Hasło" disabled>
-                                    </div>
-                                         </div>
-                                </div>
-                            </div>
-                    </div>
-                        </form>
-                </div>
-
-          </div>
-                 <div class="container">
-                     <hr class="mb-4">
-                <input class="btn btn-primary btn-lg btn-block" type="submit" onclick="butons()"  value="Edytuj" id="buton">
-                </div>
-
-
-
-
-            <!-- <div class="jumbotron jumbotron-fluid">
-              <div class="container">
-                <h1 class="display-4">Tu będzie mój profil</h1>
-              </div>
-            </div> -->
-
-          </div>
+  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <div class="jumbotron text-center">
+      <img src="{{ url_for('static', filename='images/user_default.png') }}" class="rounded mx-auto d-block" alt="profile_image">
+      <h1 class="display-5" style="padding: 1rem;">{{details['name']}} {{details['surname']}}</h1>
+        <p class="lead">Email: {{details['email']}}</p>
+    </div>
       {% with messages = get_flashed_messages() %}
           {% if messages %}
             <ul class=flashes style="margin-top:20px">
