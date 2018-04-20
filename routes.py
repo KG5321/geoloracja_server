@@ -125,6 +125,21 @@ def myprofile():
     else:
         return render_template('myprofile.html')
 
+@app.route('/adminurzadz', methods=['GET'])
+def adminurzadz():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('adminurzadz.html')
+
+@app.route('/adminuzyt', methods=['GET'])
+def adminuzyt():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('adminuzyt.html')
+
+
 @app.route('/logout')
 def logout():
     if not session.get('loggedIn'):
