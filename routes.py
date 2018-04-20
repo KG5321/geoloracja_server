@@ -160,6 +160,14 @@ def myprofile():
         details['email'] = currentUser.email
         return render_template('myprofile.html', details=details)
 
+@app.route('/editprofile', methods=['GET', 'POST'])
+def editprofile():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        return render_template('editprofile.html', user=currentUser)
+
 @app.route('/logout')
 def logout():
     if not session.get('loggedIn'):

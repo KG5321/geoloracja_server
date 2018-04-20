@@ -48,13 +48,13 @@
          <div class="sidebar-sticky">
            <ul class="nav flex-column">
              <li class="nav-item">
-               <a class="nav-link active" href="{{ url_for('myprofile') }}">
+               <a class="nav-link" href="{{ url_for('myprofile') }}">
                  <span data-feather="home"></span>
                  Profil <span class="sr-only">(current)</span>
                </a>
              </li>
              <li class="nav-item">
-               <a class="nav-link" href="{{ url_for('editprofile') }}">
+               <a class="nav-link active" href="{{ url_for('editprofile') }}">
                  <span data-feather="file"></span>
                  Edytuj profil
                </a>
@@ -99,12 +99,27 @@
   <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 
 
-  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-    <div class="jumbotron text-center">
-      <img src="{{ url_for('static', filename='images/user_default.png') }}" class="rounded mx-auto d-block" alt="profile_image">
-      <h1 class="display-5" style="padding: 1rem;">{{details['name']}} {{details['surname']}}</h1>
-        <p class="lead">Email: {{details['email']}}</p>
+  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" style="margin-top: 4rem;">
+    <h2>Edycja profilu</h2>
+    <hr class="my-4">
+    <form action="/editprofile" method="POST">
+      <div class="form-group">
+        <label for="name">Imię</label>
+        <input type="text" class="form-control" id="name" name="nameField" placeholder="{{user.name}}">
+      </div>
+      <div class="form-group">
+        <label for="surname">Nazwisko</label>
+        <input type="text" class="form-control" id="surname" name="surnameField" placeholder="{{user.surname}}">
+      </div>
+      <button type="submit" class="btn btn-success">Zapisz</button>
+    </form>
+    <hr class="my-4">
+    <br>
+    <h1>Reset hasła</h1>
+      <br>
+    <a class="btn btn-success" href="{{ url_for('myprofile') }}">Zresetuj hasło</a>
     </div>
+
       {% with messages = get_flashed_messages() %}
           {% if messages %}
             <ul class=flashes style="margin-top:20px">
