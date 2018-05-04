@@ -51,13 +51,13 @@
          <div class="sidebar-sticky">
            <ul class="nav flex-column">
              <li class="nav-item">
-               <a class="nav-link active" href="{{ url_for('dashboard') }}">
+               <a class="nav-link" href="{{ url_for('dashboard') }}">
                  <span data-feather="home"></span>
                  Mapa urządzeń <span class="sr-only">(current)</span>
                </a>
              </li>
              <li class="nav-item">
-               <a class="nav-link" href="{{ url_for('selectarea') }}">
+               <a class="nav-link active" href="{{ url_for('selectarea') }}">
                  <span data-feather="file"></span>
                  Zaznacz obszar
                </a>
@@ -115,7 +115,6 @@
               <script>
                 var map;
                 function initMap() {
-                  var myLatLng = {lat: 51.11015329802461, lng: 17.059872222290096};
                   map = new google.maps.Map(document.getElementById('map'), {
                     center: {lat: 51.108860, lng: 17.050860},
                     zoom: 13,
@@ -123,35 +122,42 @@
                     zoomControl: true,
                     gestureHandling: 'cooperative'
                   });
-                  var triangleCoords = [{lat: 51.11338638475104, lng: 17.037470412597713}, {lat: 51.110476616875886, lng: 17.02305085693365}, {lat: 51.10778222399999, lng: 17.025110793457088}, {lat: 51.10616551287528, lng: 17.045366835937557}, {lat: 51.11198540827418, lng: 17.04880006347662}]
-                  var bermudaTriangle = new google.maps.Polygon({
-                    paths: triangleCoords,
-                    strokeColor: '#F00000',
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    fillColor: '#0000FF',
-                    fillOpacity: 0.35
-                  });
-                  bermudaTriangle.setMap(map);
-                  var contentString = '<div id="content">'+
-                        '<div id="siteNotice">'+
-                        '</div>'+
-                        '<h1 id="firstHeading" class="firstHeading">Motek</h1>'+
-                        '<div id="bodyContent">'+
-                        '<p>Twoje urządzenie <b>Motek</b> znajduje się w tej lokalizacji.</p>' +
-                        '</div>'+
-                        '</div>';
-                  var infowindow = new google.maps.InfoWindow({
-                    content: contentString
-                  });
-                  var marker = new google.maps.Marker({
-                    position: myLatLng,
-                    map: map,
-                    title: 'Motek'
-                  });
-                  marker.addListener('click', function() {
-                    infowindow.open(map, marker);
-                  });
+                  var drawingManager = new google.maps.drawing.DrawingManager({
+                      drawingMode: google.maps.drawing.OverlayType.POLYGON,
+                      drawingControl: true,
+                      drawingControlOptions: {
+                        position: google.maps.ControlPosition.TOP_CENTER,
+                        drawingModes: ['polygon', 'circle']
+                      },
+                      markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
+                      circleOptions: {
+                        fillColor: '#404040',
+                        fillOpacity: 0.4,
+                        strokeWeight: 5,
+                        clickable: false,
+                        editable: true,
+                        zIndex: 1
+                      }
+                    });
+                    google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
+                        var coordinates = (polygon.getPath().getArray());
+                        var coords = '['
+                        for(var i = 0; i < coordinates.length; i++){
+                          var lat = coordinates[i].lat();
+                          var lng = coordinates[i].lng();
+                          if(i==coordinates.length-1){
+                            coords =  coords + '{lat: ' + lat +', lng: ' + lng + '}';
+                          } else {
+                            coords =  coords + '{lat: ' + lat +', lng: ' + lng + '}, ';
+                          }
+                        }
+                        coords =  coords + ']';
+                        var data = coordinates[1].lat;
+                        $.post("/getcoords", coords);
+                        $('#coord').html(coords);
+                      });
+                  drawingManager.setMap(map);
+                  // map.disableScrollWheelZoom();
                 }
               </script>
               <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaw3kCuHb1rRCMMMkxxsmpLB8kRwIKSfs&callback=initMap&libraries=drawing"

@@ -103,23 +103,6 @@
     <h2>Edycja profilu</h2>
     <hr class="my-4">
     <form action="/editprofile" method="POST">
-      <div class="form-group">
-        <label for="name">Imię</label>
-        <input type="text" class="form-control" id="name" name="nameField" placeholder="{{user.name}}">
-      </div>
-      <div class="form-group">
-        <label for="surname">Nazwisko</label>
-        <input type="text" class="form-control" id="surname" name="surnameField" placeholder="{{user.surname}}">
-      </div>
-      <button type="submit" class="btn btn-success">Zapisz</button>
-    </form>
-    <hr class="my-4">
-    <br>
-    <h1>Reset hasła</h1>
-      <br>
-    <a class="btn btn-success" href="{{ url_for('myprofile') }}">Zresetuj hasło</a>
-    </div>
-
       {% with messages = get_flashed_messages() %}
           {% if messages %}
             <ul class=flashes style="margin-top:20px">
@@ -138,6 +121,24 @@
           {% endif %}
         {% endwith %}
       {% block body %}{% endblock %}
+      <div class="form-group">
+        <label for="name">Imię</label>
+        <input type="text" class="form-control" id="name" name="nameField" placeholder="{{user.name}}">
+      </div>
+      <div class="form-group">
+        <label for="surname">Nazwisko</label>
+        <input type="text" class="form-control" id="surname" name="surnameField" placeholder="{{user.surname}}">
+      </div>
+      <button type="submit" class="btn btn-success">Zapisz</button>
+    </form>
+    <hr class="my-4">
+    <br>
+    <h1>Reset hasła</h1>
+      <br>
+    <a class="btn btn-success" href="{{ url_for('myprofile') }}">Zresetuj hasło</a>
+    </div>
+
+
     </div>
   </div>
 

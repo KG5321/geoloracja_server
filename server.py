@@ -8,7 +8,7 @@ from itsdangerous import URLSafeTimedSerializer
 
 
 app = Flask(__name__)
-app.config.from_pyfile('config.py')
+app.config.from_pyfile('config.cfg')
 socketio = SocketIO(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)

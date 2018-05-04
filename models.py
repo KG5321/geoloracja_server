@@ -7,6 +7,11 @@ userDevice = db.Table('userDevice',
     db.Column('device_id', db.Integer, db.ForeignKey('devices.id'))
 )
 
+deviceArea = db.Table('deviceArea',
+    db.Column('device_id', db.Integer, db.ForeignKey('devices.id')),
+    db.Column('area_id', db.Integer, db.ForeignKey('areas.id'))
+)
+
 class User(db.Model):
 
     __tablename__ = 'users'
@@ -59,3 +64,15 @@ class Device(db.Model):
         self.currentLat = currentLat
         self.currentLng = currentLng
         self.lastUpdate = time.currentUTC()
+
+
+class Area(db.Model):
+
+    __tablename__ = 'areas'
+
+    id = db.Column(db.Integer, primary_key=True)
+    coordinatesString = db.Column(db.String)
+    devices = db.relationship('Device', secondary=deviceArea, backref=db.backref('area', lazy='dynamic'))
+
+    def __init__(self,coordinatesString):
+        self.coordinatesString = coordinatesString

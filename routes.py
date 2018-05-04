@@ -2,10 +2,10 @@
 from server import app, db, socketio, mail, serializer
 from flask_mail import Message
 from models import User, Device
-from flask import render_template, request, url_for, redirect, session, flash, abort
+from flask import render_template, request, url_for, redirect, session, flash, abort, jsonify
 from sqlalchemy import exc
 from threading import Thread, Event
-import ttn, itsdangerous
+import ttn, itsdangerous, json
 from time import sleep
 
 
@@ -148,6 +148,14 @@ def dashboard():
         print('Current user: '+currentUser.name+' '+currentUser.surname)
         return render_template('dashboard.html', admin=isAdmin)
 
+
+@app.route('/selectarea')
+def selectarea():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('selectarea.html')
+
 @app.route('/myprofile', methods=['GET'])
 def myprofile():
     if not session.get('loggedIn'):
@@ -166,7 +174,35 @@ def editprofile():
         return redirect(url_for('login'))
     else:
         currentUser = User.query.get(session['currentUserId'])
-        return render_template('editprofile.html', user=currentUser)
+        if request.method == 'GET':
+            return render_template('editprofile.html', user=currentUser)
+        if request.form['nameField'] == '' and request.form['surnameField'] == '':
+            flash(u'Pola sa puste')
+            return redirect(url_for('editprofile'))
+        if request.form['nameField'] != '' and request.form['surnameField'] != '':
+            currentUser.name = request.form['nameField']
+            currentUser.surname = request.form['surnameField']
+            db.session.commit()
+            flash(u'Zmieniono imie i nazwisko')
+            return redirect(url_for('editprofile'))
+        if request.form['nameField'] != '':
+            currentUser.name = request.form['nameField']
+            db.session.commit()
+            flash(u'Zmieniono imię')
+            return redirect(url_for('editprofile'))
+        if request.form['surnameField'] != '':
+            currentUser.surname = request.form['surnameField']
+            db.session.commit()
+            flash(u'Zmieniono nazwisko')
+            return redirect(url_for('editprofile'))
+        return redirect(url_for('editprofile'))
+
+@app.route('/getcoords', methods=['POST'])
+def getcoords():
+    content = request.form
+    for items in content:
+        print(items)
+    return 'OK'
 
 @app.route('/logout')
 def logout():
