@@ -1,21 +1,33 @@
-import time
+from threading import Thread, Event
+from time import sleep, asctime
 import ttn
-from flask import jsonify
+#from server import thread, thread_stop_event
 
-app_id = "geoloracja"
-access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
+class Lora(Thread):
+    def __init__(self):
+        self.delay = 5
+        super(Lora, self).__init__()
 
-def uplink_callback(msg, client):
-    print("Received uplink from ", msg.dev_id)
-    print(msg)
+    def uplink_listener(self):
+        print("Uplink listener is running...")
+        app_id = "geoloracja"
+        access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
+        handler = ttn.HandlerClient(app_id, access_key)
+        while True:
+            mclient = handler.data()
+            mclient.set_uplink_callback(self.uplink_callback)
+            mclient.connect()
+            sleep(self.delay)
+            mclient.close()
 
-handler = ttn.HandlerClient(app_id, access_key)
+    def uplink_callback(self, msg, client):
+        print(msg.dev_id)
+        print('{{lat: {}, lng: {}}}'.format(msg.payload_fields.latitude, msg.payload_fields.longitude))
+        sleep(self.delay)
 
-print("Started listening...")
+    def run(self):
+        self.uplink_listener()
 
-while True:
-    mqtt_client = handler.data()
-    mqtt_client.set_uplink_callback(uplink_callback)
-    mqtt_client.connect()
-    time.sleep(1)
-    mqtt_client.close()
+
+# Valid payload data for testing uplink
+# 00272808080383F448B4C60C1FC10000

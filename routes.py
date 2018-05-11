@@ -1,11 +1,10 @@
 # coding: utf-8
-from server import app, db, socketio, mail, serializer
+from server import app, db, mail, serializer
 from flask_mail import Message
 from models import User, Device
 from flask import render_template, request, url_for, redirect, session, flash, abort, jsonify
 from sqlalchemy import exc
-from threading import Thread, Event
-import ttn, itsdangerous, json
+import itsdangerous, json
 from time import sleep
 
 
@@ -15,25 +14,6 @@ def index():
         return render_template('main.html')
     else:
         return redirect(url_for('dashboard'))
-
-@socketio.on('connect')
-def socket_connect():
-    if not session.get('loggedIn'):
-        return redirect(url_for('login'))
-    else:
-        global thread
-        print('Client connected')
-        if not thread.isAlive():
-            print("Starting thread")
-            thread = Lora()
-            thread.start()
-
-@socketio.on('disconnect')
-def socket_disconnect():
-    if not session.get('loggedIn'):
-        return redirect(url_for('login'))
-    else:
-        print('Client disconnected')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -145,7 +125,6 @@ def dashboard():
     else:
         currentUser = User.query.get(session['currentUserId'])
         isAdmin = currentUser.isAdmin
-        print('Current user: '+currentUser.name+' '+currentUser.surname)
         return render_template('dashboard.html', admin=isAdmin)
 
 
@@ -219,32 +198,32 @@ def page_not_found(e):
 
 #Thread for getting live messages from devices
 
-thread = Thread()
-thread_stop_event = Event()
-
-class Lora(Thread):
-    def __init__(self):
-        self.delay = 5
-        super(Lora, self).__init__()
-
-    def lora_listener(self):
-        print("Started listening...")
-        app_id = "geoloracja"
-        access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
-        handler = ttn.HandlerClient(app_id, access_key)
-        while not thread_stop_event.isSet():
-            mqtt_client = handler.data()
-            mqtt_client.set_uplink_callback(self.uplink_callback)
-            mqtt_client.connect()
-            sleep(self.delay)
-            mqtt_client.close()
-
-    def uplink_callback(self, msg, client):
-        print(msg.payload_fields)
-        socketio.emit('abc', {'msg': msg.payload_fields})
-
-    def run(self):
-        self.lora_listener()
+# thread = Thread()
+# thread_stop_event = Event()
+#
+# class Lora(Thread):
+#     def __init__(self):
+#         self.delay = 5
+#         super(Lora, self).__init__()
+#
+#     def lora_listener(self):
+#         print("Started listening...")
+#         app_id = "geoloracja"
+#         access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
+#         handler = ttn.HandlerClient(app_id, access_key)
+#         while not thread_stop_event.isSet():
+#             mqtt_client = handler.data()
+#             mqtt_client.set_uplink_callback(self.uplink_callback)
+#             mqtt_client.connect()
+#             sleep(self.delay)
+#             mqtt_client.close()
+#
+#     def uplink_callback(self, msg, client):
+#         print(msg.payload_fields)
+#         socketio.emit('abc', {'msg': msg.payload_fields})
+#
+#     def run(self):
+#         self.lora_listener()
 
 #Test routes test 123
 
