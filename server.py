@@ -4,7 +4,6 @@ from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from threading import Thread, Event
-from lora_connect import Lora
 
 
 app = Flask(__name__)
@@ -18,10 +17,10 @@ thread = Thread()
 thread_stop_event = Event()
 
 from routes import *
-
-# Lora thread for monitoring TTN
+from lora_connect import Lora
 
 if __name__ == '__main__':
+    # Lora thread for monitoring TTN
     if not thread.isAlive():
         print("Starting Lora thread")
         thread = Lora()

@@ -115,7 +115,6 @@
               <script>
                 var map;
                 function initMap() {
-                  var myLatLng = {lat: 51.1215151693243, lng: 17.049431449107104};
                   map = new google.maps.Map(document.getElementById('map'), {
                     center: {lat: 51.108860, lng: 17.050860},
                     zoom: 13,
@@ -133,25 +132,28 @@
                     fillOpacity: 0.35
                   });
                   bermudaTriangle.setMap(map);
-                  var contentString = '<div id="content">'+
-                        '<div id="siteNotice">'+
-                        '</div>'+
-                        '<h1 id="firstHeading" class="firstHeading">Motek</h1>'+
-                        '<div id="bodyContent">'+
-                        '<p>Twoje urządzenie <b>Motek</b> znajduje się w tej lokalizacji.</p>' +
-                        '</div>'+
-                        '</div>';
-                  var infowindow = new google.maps.InfoWindow({
-                    content: contentString
+                  {% for device in devices %}
+                    var {{device.name}}pin = {lat: {{ device.currentLat }}, lng: {{ device.currentLng }}};
+                    var {{device.name}}content = '<div id="content">'+
+                          '<div id="siteNotice">'+
+                          '</div>'+
+                          '<h1 id="firstHeading" class="firstHeading">{{ device.name }}</h1>'+
+                          '<div id="bodyContent">'+
+                          '<p>Twoje urządzenie <b>{{ device.name }}</b> znajduje się w tej lokalizacji.</p>' +
+                          '</div>'+
+                          '</div>';
+                    var {{device.name}}window = new google.maps.InfoWindow({
+                      content: {{device.name}}content
+                    });
+                    var {{ device.name }} = new google.maps.Marker({
+                      position: {{device.name}}pin,
+                      map: map,
+                      title: '{{ device.name }}'
+                    });
+                    {{ device.name }}.addListener('click', function() {
+                      {{device.name}}window.open(map, {{ device.name }});
                   });
-                  var marker = new google.maps.Marker({
-                    position: myLatLng,
-                    map: map,
-                    title: 'Motek'
-                  });
-                  marker.addListener('click', function() {
-                    infowindow.open(map, marker);
-                  });
+                  {%endfor%}
                 }
               </script>
               <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaw3kCuHb1rRCMMMkxxsmpLB8kRwIKSfs&callback=initMap&libraries=drawing"

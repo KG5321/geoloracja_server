@@ -125,7 +125,8 @@ def dashboard():
     else:
         currentUser = User.query.get(session['currentUserId'])
         isAdmin = currentUser.isAdmin
-        return render_template('dashboard.html', admin=isAdmin)
+        devices = currentUser.device
+        return render_template('dashboard.html', admin=isAdmin, devices=devices)
 
 
 @app.route('/selectarea')
@@ -176,12 +177,16 @@ def editprofile():
             return redirect(url_for('editprofile'))
         return redirect(url_for('editprofile'))
 
+# In development
+
 @app.route('/getcoords', methods=['POST'])
 def getcoords():
     content = request.form
     for items in content:
         print(items)
     return 'OK'
+
+# development
 
 @app.route('/logout')
 def logout():

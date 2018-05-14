@@ -1,6 +1,6 @@
 from server import db, bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
-import time
+from datetime import datetime
 
 userDevice = db.Table('userDevice',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
@@ -49,7 +49,7 @@ class Device(db.Model):
 
     id = db.Column(db.Integer, primary_key = True)
     deviceAddress = db.Column(db.String)
-    name = db.Column(db.String)
+    name = db.Column(db.String, unique=True)
     currentLat = db.Column(db.Float)
     currentLng = db.Column(db.Float)
     lastUpdate = db.Column(db.DateTime)
@@ -63,7 +63,8 @@ class Device(db.Model):
     def set_location(self, currentLat, currentLng):
         self.currentLat = currentLat
         self.currentLng = currentLng
-        self.lastUpdate = time.currentUTC()
+        self.lastUpdate = datetime.now()
+        db.session.commit()
 
 
 class Area(db.Model):
