@@ -131,7 +131,27 @@
                     fillColor: '#0000FF',
                     fillOpacity: 0.35
                   });
+
+
+
+                  // var content = '<div id="content">'+
+                  //       '<div id="siteNotice">'+
+                  //       '</div>'+
+                  //       '<h1 id="firstHeading" class="firstHeading">obrszar</h1>'+
+                  //       '<div id="bodyContent">'+
+                  //       '<p>Twoje urządzenie <b>obszar</b> znajduje się w tej lokalizacji.</p>' +
+                  //       '</div>'+
+                  //       '</div>';
+                  // var infWindow = new google.maps.InfoWindow({
+                  //   content: content
+                  // });
                   bermudaTriangle.setMap(map);
+                  // bermudaTriangle.addListener('click', function(){
+                  //   infWindow.open(map, bermudaTriangle)
+                  // });
+
+
+
                   {% for device in devices %}
                     var {{device.name}}pin = {lat: {{ device.currentLat }}, lng: {{ device.currentLng }}};
                     var {{device.name}}content = '<div id="content">'+

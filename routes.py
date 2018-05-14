@@ -79,14 +79,42 @@ def confirm_email(token):
     db.session.commit()
     return redirect(url_for('login'))
 
-@app.route('/passwordreset/<token>')
-def password_reset(token):
+@app.route('/passwordreset/<token>', methods = ['GET', 'POST'])
+def password_reset_token(token):
     try:
         email = serializer.loads(token, salt='password-reset')
     except itsdangerous.BadSignature:
         return '<h1>Błędny token</h1>'
-    return '<h1>Works</h1>'
+    if request.method =='GET':
+        return render_template('passwordreset.html', token=token)
+    if request.form['passwordField'] == request.form['password2Field']:
+        userResetPassword = User.query.filter_by(email=email).first()
+        userResetPassword.passwordHash = userResetPassword.set_password(request.form['passwordField'])
+        db.session.commit()
+        flash(u'Hasło zostało zmienione')
+        return redirect(url_for('logout'))
+    else:
+        flash(u'Wprowadzone hasła różnią się')
+        return render_template('passwordreset.html', token=token)
 
+
+@app.route('/passwordreset')
+def password_reset():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        email = currentUser.email
+        name = currentUser.name
+        token = serializer.dumps(email, salt='password-reset')
+        msg = Message('Zresetuj hasło', sender='Geoloracja', recipients=[email])
+        link = url_for('password_reset_token', token=token, _external=True)
+        msg.body = 'Witaj {}!\n\nAby zresetować hasło w systemie Geoloracja kliknij w poniższy link:\n\n {} \n\n Zespół Geoloracja.'.format(name, link)
+        mail.send(msg)
+        flash(u'Wysłano email z linkiem resetującym hasło')
+        session['loggedIn'] = False
+        session['currentUserId'] = None
+        return redirect(url_for('login'))
 
 @app.route('/mydevices', methods=['GET'])
 def mydevices():
