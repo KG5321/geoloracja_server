@@ -99,7 +99,8 @@
          </div>
        </nav>
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <!-- <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script> -->
 
   <style>
       /* Always set the map height explicitly to define the size of the div
@@ -110,10 +111,40 @@
     </style>
 
   <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-          <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3">
-            <div id="map" style="height:700px; margin-top: 4rem;"></div>
+          <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3" style="margin-top: 4rem;">
+            <h2>1. Wybierz urządzenie</h2>
+            <!-- <hr class="my-4"> -->
+            <div class="dropdown" style="margin-top: 2rem;">
+              <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Urządzenie
+                <span class="caret"></span>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for device in devices %}
+                <a class="dropdown-item" href="#">{{ device.name }}</a>
+                {% endfor %}
+              </div>
+            </div>
+            <hr class="my-4">
+            <h2>2. Zaznacz obszar na mapie</h2>
+
+            <div id="map" style="height:700px; margin-top: 1rem;"></div>
+
+            <h2 style="margin-top: 2rem;">3. Zatwierdź obszar</h2>
+            <a id="set" class="btn btn-success my-2 my-sm-0" href="{{ url_for('dashboard') }}" style="color: #fff;">Zatwierdź</a>
+
+
+
               <script>
                 var map;
+                var deviceName;
+                var coords;
+                $(".dropdown-menu a").click(function(){
+                  deviceName = $(this).text();
+                  $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
+                  $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                });
+
                 function initMap() {
                   map = new google.maps.Map(document.getElementById('map'), {
                     center: {lat: 51.108860, lng: 17.050860},
@@ -127,7 +158,7 @@
                       drawingControl: true,
                       drawingControlOptions: {
                         position: google.maps.ControlPosition.TOP_CENTER,
-                        drawingModes: ['polygon', 'circle']
+                        drawingModes: ['polygon']
                       },
                       markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
                       circleOptions: {
@@ -141,7 +172,7 @@
                     });
                     google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
                         var coordinates = (polygon.getPath().getArray());
-                        var coords = '['
+                        coords = '['
                         for(var i = 0; i < coordinates.length; i++){
                           var lat = coordinates[i].lat();
                           var lng = coordinates[i].lng();
@@ -152,25 +183,22 @@
                           }
                         }
                         coords =  coords + ']';
+                        coords = coords;
                         var data = coordinates[1].lat;
-                        $.post("/getcoords", coords);
-                        $('#coord').html(coords);
+                        //$.post("/getcoords", coords);
+                        //$('#coord').html(coords);
                       });
                   drawingManager.setMap(map);
                   // map.disableScrollWheelZoom();
                 }
+
+                $('#set').click(function(){
+                    var linkString = "/setarea/"+deviceName
+                    $.post(linkString, coords);
+                });
               </script>
               <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaw3kCuHb1rRCMMMkxxsmpLB8kRwIKSfs&callback=initMap&libraries=drawing"
               async defer></script>
-
-
-            <!-- <div class="jumbotron jumbotron-fluid">
-              <div class="container">
-                <h1 class="display-4">Tu będzie mapa</h1>
-                <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
-              </div>
-            </div> -->
-
           </div>
           <div id="coord">
       {% with messages = get_flashed_messages() %}

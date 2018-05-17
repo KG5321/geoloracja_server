@@ -1,7 +1,7 @@
 # coding: utf-8
 from server import app, db, mail, serializer
 from flask_mail import Message
-from models import User, Device
+from models import User, Device, Area
 from flask import render_template, request, url_for, redirect, session, flash, abort, jsonify
 from sqlalchemy import exc
 import itsdangerous, json
@@ -125,6 +125,26 @@ def mydevices():
         devices = currentUser.device
         return render_template('mydevices.html', devices=devices)
 
+
+@app.route('/testdelete')
+def testdelete():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        devices = currentUser.device
+        for device in devices:
+            print(device.name)
+        # currentUser.device.remove()
+        for de in devices:
+            if de.name == 'kupa':
+                currentUser.device.remove(de)
+                db.session.commit()
+        # db.session.query(Device).filter_by(name='test1').children.remove()
+        # db.session.delete(device)
+        # db.session.commit()
+        return 'Removed'
+
 @app.route('/newdevice', methods=['GET', 'POST'])
 def newdevice():
     if not session.get('loggedIn'):
@@ -162,7 +182,9 @@ def selectarea():
     if not session.get('loggedIn'):
         return redirect(url_for('login'))
     else:
-        return render_template('selectarea.html')
+        currentUser = User.query.get(session['currentUserId'])
+        devices = currentUser.device
+        return render_template('selectarea.html', devices=devices)
 
 @app.route('/myprofile', methods=['GET'])
 def myprofile():
@@ -207,12 +229,26 @@ def editprofile():
 
 # In development
 
-@app.route('/getcoords', methods=['POST'])
-def getcoords():
-    content = request.form
-    for items in content:
-        print(items)
-    return 'OK'
+@app.route('/setarea/<deviceName>', methods=['POST'])
+def getcoords(deviceName):
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        devices = currentUser.device
+        content = request.form
+        coordinatesString = ''
+        for items in content:
+            coordinatesString = items
+        for device in devices:
+            if device.name == deviceName:
+                newArea = Area(coordinatesString)
+                db.session.add(newArea)
+                userDevice = Device.query.filter_by(name=deviceName).first()
+                userDevice.area.append(newArea)
+                db.session.commit()
+        flash(u'Ustawiono nowy obszar dla urzadzenia '+deviceName)
+        return 'OK'
 
 # development
 
@@ -228,6 +264,11 @@ def logout():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+
+@app.route('/testnotif')
+def notif():
+    return '<script>var e = new Notification("Geoloracja", { body: "Twoje urządzenie opuściło obszar!", icon: "http://localhost:5000/static/images/geoloracja_logo.png" });</script>'
 
 #Thread for getting live messages from devices
 

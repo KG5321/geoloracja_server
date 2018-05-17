@@ -22,9 +22,6 @@ class Lora(Thread):
             client.close()
 
     def uplink_callback(self, msg, client):
-        #print(msg)
-        # print(msg.dev_id)
-        # print('{{lat: {}, lng: {}}}'.format(msg.payload_fields.latitude, msg.payload_fields.longitude))
         self.update_device(msg)
 
     def update_device(self, msg):
