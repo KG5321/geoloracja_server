@@ -120,7 +120,11 @@
                       <td>{{loop.index}}</td>
                       <td>{{device.name}}</td>
                       <td>{{device.deviceAddress}}</td>
-                      <td>{{device.lastUpdate.replace(microsecond=0)}}</td>
+                      {% if device.lastUpdate != None %}
+                        <td>{{device.lastUpdate.replace(microsecond=0)}}</td>
+                      {% else %}
+                        <td>Brak</td>
+                      {% endif %}
                       <td><a class="btn btn-success" data-toggle="modal" data-target="#{{device.name}}Modal" style="padding: 0.5% 0; width: 70px; color: #fff;">Edytuj</a></td>
                       <!-- Modal -->
                         <div class="modal fade" id="{{device.name}}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
