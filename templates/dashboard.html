@@ -143,16 +143,18 @@
                   var myLatlng = new google.maps.LatLng(51.108860, 17.050860);
 
                   {% for device in devices %}
-                    var {{ device.name }}Coords = {{ device.area.all()[0].coordinatesString }}
-                    var {{ device.name }}Area = new google.maps.Polygon({
-                      paths: {{ device.name }}Coords,
-                      strokeColor: '#032200',
-                      strokeOpacity: 0.8,
-                      strokeWeight: 2,
-                      fillColor: '#00cbc5',
-                      fillOpacity: 0.35
-                    });
-                    {{ device.name }}Area.setMap(map);
+                    {% if device.area.all() %}
+                      var {{ device.name }}Coords = {{ device.area.all()[0].coordinatesString }}
+                      var {{ device.name }}Area = new google.maps.Polygon({
+                        paths: {{ device.name }}Coords,
+                        strokeColor: '#032200',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: '#00cbc5',
+                        fillOpacity: 0.35
+                      });
+                      {{ device.name }}Area.setMap(map);
+                    {% endif %}
                   {% endfor %}
 
                   // var content = '<div id="content">'+

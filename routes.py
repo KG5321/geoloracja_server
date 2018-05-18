@@ -125,6 +125,23 @@ def mydevices():
         devices = currentUser.device
         return render_template('mydevices.html', devices=devices)
 
+@app.route('/removedevice/<address>')
+def removeDevice(address):
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        devices = currentUser.device
+        for device in devices:
+            if device.deviceAddress == address:
+                currentUser.device.remove(device)
+                db.session.delete(device)
+                db.session.commit()
+                flash(u'Usunięto urządzenie '+device.name)
+                return redirect(url_for('mydevices'))
+        flash(u'Błędne dane!')
+        return redirect(url_for('mydevices'))
+
 
 @app.route('/testdelete')
 def testdelete():
@@ -227,7 +244,6 @@ def editprofile():
             return redirect(url_for('editprofile'))
         return redirect(url_for('editprofile'))
 
-# In development
 
 @app.route('/setarea/<deviceName>', methods=['POST'])
 def getcoords(deviceName):
@@ -250,7 +266,6 @@ def getcoords(deviceName):
         flash(u'Ustawiono nowy obszar dla urzadzenia '+deviceName)
         return 'OK'
 
-# development
 
 @app.route('/logout')
 def logout():

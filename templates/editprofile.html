@@ -102,25 +102,25 @@
   <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" style="margin-top: 4rem;">
     <h2>Edycja profilu</h2>
     <hr class="my-4">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class=flashes style="margin-top:20px">
+            {% for message in messages %}
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-5">
+                        <div class="alert alert-danger text-center" role="alert">
+                            {{ message }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    {% block body %}{% endblock %}
     <form action="/editprofile" method="POST">
-      {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul class=flashes style="margin-top:20px">
-              {% for message in messages %}
-              <div class="container-fluid">
-                  <div class="row">
-                      <div class="col-md-10 col-md-offset-5">
-                          <div class="alert alert-danger text-center" role="alert">
-                              {{ message }}
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
-      {% block body %}{% endblock %}
       <div class="form-group">
         <label for="name">Imię</label>
         <input type="text" class="form-control" id="name" name="nameField" placeholder="{{user.name}}">
