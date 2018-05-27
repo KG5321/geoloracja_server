@@ -51,13 +51,13 @@
          <div class="sidebar-sticky">
            <ul class="nav flex-column">
              <li class="nav-item">
-               <a class="nav-link active" href="{{ url_for('dashboard') }}">
+               <a class="nav-link" href="{{ url_for('dashboard') }}">
                  <span data-feather="home"></span>
                  Mapa urządzeń <span class="sr-only">(current)</span>
                </a>
              </li>
              <li class="nav-item">
-               <a class="nav-link" href="{{ url_for('selectarea') }}">
+               <a class="nav-link active" href="{{ url_for('selectarea') }}">
                  <span data-feather="file"></span>
                  Zaznacz obszar
                </a>
@@ -99,7 +99,8 @@
          </div>
        </nav>
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <!-- <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script> -->
 
   <style>
       /* Always set the map height explicitly to define the size of the div
@@ -111,27 +112,39 @@
 
   <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3" style="margin-top: 4rem;">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                  <ul class=flashes style="margin-top:20px">
-                    {% for message in messages %}
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-10 col-md-offset-5">
-                                <div class="alert alert-danger text-center" role="alert">
-                                    {{ message }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              {% endwith %}
-            {% block body %}{% endblock %}
-            <div id="map" style="height:700px;"></div>
+            <h2>1. Wybierz urządzenie</h2>
+            <!-- <hr class="my-4"> -->
+            <div class="dropdown" style="margin-top: 2rem;">
+              <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Urządzenie
+                <span class="caret"></span>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for device in devices %}
+                <a class="dropdown-item" href="#">{{ device.name }}</a>
+                {% endfor %}
+              </div>
+            </div>
+            <hr class="my-4">
+            <h2>2. Zaznacz obszar na mapie</h2>
+
+            <div id="map" style="height:700px; margin-top: 1rem;"></div>
+
+            <h2 style="margin-top: 2rem;">3. Zatwierdź obszar</h2>
+            <a id="set" class="btn btn-success my-2 my-sm-0" href="{{ url_for('dashboard') }}" style="color: #fff;">Zatwierdź</a>
+
+
+
               <script>
                 var map;
+                var deviceName;
+                var coords;
+                $(".dropdown-menu a").click(function(){
+                  deviceName = $(this).text();
+                  $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
+                  $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+                });
+
                 function initMap() {
                   map = new google.maps.Map(document.getElementById('map'), {
                     center: {lat: 51.108860, lng: 17.050860},
@@ -140,87 +153,72 @@
                     zoomControl: true,
                     gestureHandling: 'cooperative'
                   });
-                  var myLatlng = new google.maps.LatLng(51.108860, 17.050860);
-
-                  {% for device in devices %}
-                    {% if device.area.all() %}
-                      var {{ device.name }}Coords = {{ device.area.all()[0].coordinatesString }}
-                      var {{ device.name }}Area = new google.maps.Polygon({
-                        paths: {{ device.name }}Coords,
-                        strokeColor: '#032200',
-                        strokeOpacity: 0.8,
-                        strokeWeight: 2,
-                        fillColor: '#00cbc5',
-                        fillOpacity: 0.35
+                  var drawingManager = new google.maps.drawing.DrawingManager({
+                      drawingMode: google.maps.drawing.OverlayType.POLYGON,
+                      drawingControl: true,
+                      drawingControlOptions: {
+                        position: google.maps.ControlPosition.TOP_CENTER,
+                        drawingModes: ['polygon']
+                      },
+                      markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
+                      circleOptions: {
+                        fillColor: '#404040',
+                        fillOpacity: 0.4,
+                        strokeWeight: 5,
+                        clickable: false,
+                        editable: true,
+                        zIndex: 1
+                      }
+                    });
+                    google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
+                        var coordinates = (polygon.getPath().getArray());
+                        coords = '['
+                        for(var i = 0; i < coordinates.length; i++){
+                          var lat = coordinates[i].lat();
+                          var lng = coordinates[i].lng();
+                          if(i==coordinates.length-1){
+                            coords =  coords + '{lat: ' + lat +', lng: ' + lng + '}';
+                          } else {
+                            coords =  coords + '{lat: ' + lat +', lng: ' + lng + '}, ';
+                          }
+                        }
+                        coords =  coords + ']';
+                        coords = coords;
+                        var data = coordinates[1].lat;
+                        //$.post("/getcoords", coords);
+                        //$('#coord').html(coords);
                       });
-                      {{ device.name }}Area.setMap(map);
-                    {% endif %}
-                  {% endfor %}
-
-                  // var content = '<div id="content">'+
-                  //       '<div id="siteNotice">'+
-                  //       '</div>'+
-                  //       '<h1 id="firstHeading" class="firstHeading">obrszar</h1>'+
-                  //       '<div id="bodyContent">'+
-                  //       '<p>Twoje urządzenie <b>obszar</b> znajduje się w tej lokalizacji.</p>' +
-                  //       '</div>'+
-                  //       '</div>';
-                  // var infWindow = new google.maps.InfoWindow({
-                  //   content: content
-                  // });
-
-                  // bermudaTriangle.addListener('click', function(){
-                  //   infWindow.open(map, bermudaTriangle)
-                  // });
-
-                  var icon = {
-                      url: "{{ url_for('static', filename='images/pin_medium.png') }}", // url
-                      //scaledSize: new google.maps.Size(25, 39.5), // scaled size
-                      origin: new google.maps.Point(0,0), // origin
-                      anchor: new google.maps.Point(11, 40) // anchor
-                  };
-
-                  {% for device in devices %}
-                    {% if device.currentLat != None %}
-                        var {{device.name}}pin = {lat: {{ device.currentLat }}, lng: {{ device.currentLng }}};
-                        var {{device.name}}content = '<div id="content">'+
-                              '<div id="siteNotice">'+
-                              '</div>'+
-                              '<h1 id="firstHeading" class="firstHeading">{{ device.name }}</h1>'+
-                              '<div id="bodyContent">'+
-                              '<p>Twoje urządzenie <b>{{ device.name }}</b> znajduje się w tej lokalizacji.</p>' +
-                              '</div>'+
-                              '</div>';
-                        var {{device.name}}window = new google.maps.InfoWindow({
-                          content: {{device.name}}content
-                        });
-                        var {{ device.name }} = new google.maps.Marker({
-                          position: {{device.name}}pin,
-                          map: map,
-                          title: '{{ device.name }}',
-                          icon: icon
-                        });
-                        {{ device.name }}.addListener('click', function() {
-                          {{device.name}}window.open(map, {{ device.name }});
-                      });
-                    {% endif %}
-                  {% endfor %}
+                  drawingManager.setMap(map);
+                  // map.disableScrollWheelZoom();
                 }
+
+                $('#set').click(function(){
+                    var linkString = "/setarea/"+deviceName
+                    $.post(linkString, coords);
+                });
               </script>
               <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaw3kCuHb1rRCMMMkxxsmpLB8kRwIKSfs&callback=initMap&libraries=drawing"
               async defer></script>
-
-
-            <!-- <div class="jumbotron jumbotron-fluid">
-              <div class="container">
-                <h1 class="display-4">Tu będzie mapa</h1>
-                <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
-              </div>
-            </div> -->
-
           </div>
-          <div id="coord"></div>
-
+          <div id="coord">
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes style="margin-top:20px">
+              {% for message in messages %}
+              <div class="container-fluid">
+                  <div class="row">
+                      <div class="col-md-10 col-md-offset-5">
+                          <div class="alert alert-danger text-center" role="alert">
+                              {{ message }}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+      {% block body %}{% endblock %}
     </div>
   </div>
 

@@ -1,12 +1,12 @@
 # coding: utf-8
-from server import app, db, socketio, mail, serializer
+from server import app, db, mail, serializer
 from flask_mail import Message
-from models import User, Device
-from flask import render_template, request, url_for, redirect, session, flash, abort
+from models import User, Device, Area
+from flask import render_template, request, url_for, redirect, session, flash, abort, jsonify
 from sqlalchemy import exc
-from threading import Thread, Event
-import ttn, itsdangerous
+import itsdangerous, json
 from time import sleep
+import requests
 
 
 @app.route('/', methods = ['GET'])
@@ -15,25 +15,6 @@ def index():
         return render_template('main.html')
     else:
         return redirect(url_for('dashboard'))
-
-@socketio.on('connect')
-def socket_connect():
-    if not session.get('loggedIn'):
-        return redirect(url_for('login'))
-    else:
-        global thread
-        print('Client connected')
-        if not thread.isAlive():
-            print("Starting thread")
-            thread = Lora()
-            thread.start()
-
-@socketio.on('disconnect')
-def socket_disconnect():
-    if not session.get('loggedIn'):
-        return redirect(url_for('login'))
-    else:
-        print('Client disconnected')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -99,15 +80,43 @@ def confirm_email(token):
     db.session.commit()
     return redirect(url_for('login'))
 
-@app.route('/passwordreset/<token>')
-def password_reset(token):
+@app.route('/passwordreset/<token>', methods = ['GET', 'POST'])
+def password_reset_token(token):
     try:
         email = serializer.loads(token, salt='password-reset')
     except itsdangerous.BadSignature:
         return '<h1>Błędny token</h1>'
-    return '<h1>Works</h1>'
+    if request.method =='GET':
+        return render_template('passwordreset.html', token=token)
+    if request.form['passwordField'] == request.form['password2Field']:
+        userResetPassword = User.query.filter_by(email=email).first()
+        userResetPassword.passwordHash = userResetPassword.set_password(request.form['passwordField'])
+        db.session.commit()
+        flash(u'Hasło zostało zmienione')
+        return redirect(url_for('logout'))
+    else:
+        flash(u'Wprowadzone hasła różnią się')
+        return render_template('passwordreset.html', token=token)
 
 
+@app.route('/passwordreset')
+def password_reset():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        email = currentUser.email
+        name = currentUser.name
+        token = serializer.dumps(email, salt='password-reset')
+        msg = Message('Zresetuj hasło', sender='Geoloracja', recipients=[email])
+        link = url_for('password_reset_token', token=token, _external=True)
+        msg.body = 'Witaj {}!\n\nAby zresetować hasło w systemie Geoloracja kliknij w poniższy link:\n\n {} \n\n Zespół Geoloracja.'.format(name, link)
+        mail.send(msg)
+        flash(u'Wysłano email z linkiem resetującym hasło')
+        session['loggedIn'] = False
+        session['currentUserId'] = None
+        return redirect(url_for('login'))
+        
 @app.route('/mydevices', methods=['GET'])
 def mydevices():
     if not session.get('loggedIn'):
@@ -116,6 +125,43 @@ def mydevices():
         currentUser = User.query.get(session['currentUserId'])
         devices = currentUser.device
         return render_template('mydevices.html', devices=devices)
+
+@app.route('/removedevice/<address>')
+def removeDevice(address):
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        devices = currentUser.device
+        for device in devices:
+            if device.deviceAddress == address:
+                currentUser.device.remove(device)
+                db.session.delete(device)
+                db.session.commit()
+                flash(u'Usunięto urządzenie '+device.name)
+                return redirect(url_for('mydevices'))
+        flash(u'Błędne dane!')
+        return redirect(url_for('mydevices'))
+
+
+@app.route('/testdelete')
+def testdelete():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        devices = currentUser.device
+        for device in devices:
+            print(device.name)
+        # currentUser.device.remove()
+        for de in devices:
+            if de.name == 'kupa':
+                currentUser.device.remove(de)
+                db.session.commit()
+        # db.session.query(Device).filter_by(name='test1').children.remove()
+        # db.session.delete(device)
+        # db.session.commit()
+        return 'Removed'
 
 @app.route('/newdevice', methods=['GET', 'POST'])
 def newdevice():
@@ -145,8 +191,18 @@ def dashboard():
     else:
         currentUser = User.query.get(session['currentUserId'])
         isAdmin = currentUser.isAdmin
-        print('Current user: '+currentUser.name+' '+currentUser.surname)
-        return render_template('dashboard.html', admin=isAdmin)
+        devices = currentUser.device
+        return render_template('dashboard.html', admin=isAdmin, devices=devices)
+
+
+@app.route('/selectarea')
+def selectarea():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        devices = currentUser.device
+        return render_template('selectarea.html', devices=devices)
 
 @app.route('/myprofile', methods=['GET'])
 def myprofile():
@@ -158,7 +214,64 @@ def myprofile():
         details['name'] = currentUser.name
         details['surname'] = currentUser.surname
         details['email'] = currentUser.email
+	details['phone'] = currentUser.phone
         return render_template('myprofile.html', details=details)
+
+@app.route('/editprofile', methods=['GET', 'POST'])
+def editprofile():
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        if request.method == 'GET':
+            return render_template('editprofile.html', user=currentUser)
+	if request.form['phoneField'] != '':
+            currentUser.phone = request.form['phoneField']
+            db.session.commit()
+            flash(u'Zmieniono Telefon')
+	if request.form['nameField'] == '' and request.form['surnameField'] == '' and request.form['phoneField'] == '':
+            flash(u'Pola sa puste')
+            return redirect(url_for('editprofile'))
+        if request.form['nameField'] != '' and request.form['surnameField'] != '':
+            currentUser.name = request.form['nameField']
+            currentUser.surname = request.form['surnameField']
+            db.session.commit()
+            flash(u'Zmieniono imie i nazwisko')
+            return redirect(url_for('editprofile'))
+        if request.form['nameField'] != '':
+            currentUser.name = request.form['nameField']
+            db.session.commit()
+            flash(u'Zmieniono imię')
+            return redirect(url_for('editprofile'))
+        if request.form['surnameField'] != '':
+            currentUser.surname = request.form['surnameField']
+            db.session.commit()
+            flash(u'Zmieniono nazwisko')
+            return redirect(url_for('editprofile'))
+        return redirect(url_for('editprofile'))
+
+
+@app.route('/setarea/<deviceName>', methods=['POST'])
+def getcoords(deviceName):
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        devices = currentUser.device
+        content = request.form
+        coordinatesString = ''
+        for items in content:
+            coordinatesString = items
+        for device in devices:
+            if device.name == deviceName:
+                newArea = Area(coordinatesString)
+                db.session.add(newArea)
+                userDevice = Device.query.filter_by(name=deviceName).first()
+                userDevice.area.append(newArea)
+                db.session.commit()
+        flash(u'Ustawiono nowy obszar dla urzadzenia '+deviceName)
+        return 'OK'
+
 
 @app.route('/logout')
 def logout():
@@ -173,34 +286,39 @@ def logout():
 def page_not_found(e):
     return render_template('404.html'), 404
 
+
+@app.route('/testnotif')
+def notif():
+    return '<script>var e = new Notification("Geoloracja", { body: "Twoje urządzenie opuściło obszar!", icon: "http://localhost:5000/static/images/geoloracja_logo.png" });</script>'
+
 #Thread for getting live messages from devices
 
-thread = Thread()
-thread_stop_event = Event()
-
-class Lora(Thread):
-    def __init__(self):
-        self.delay = 5
-        super(Lora, self).__init__()
-
-    def lora_listener(self):
-        print("Started listening...")
-        app_id = "geoloracja"
-        access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
-        handler = ttn.HandlerClient(app_id, access_key)
-        while not thread_stop_event.isSet():
-            mqtt_client = handler.data()
-            mqtt_client.set_uplink_callback(self.uplink_callback)
-            mqtt_client.connect()
-            sleep(self.delay)
-            mqtt_client.close()
-
-    def uplink_callback(self, msg, client):
-        print(msg.payload_fields)
-        socketio.emit('abc', {'msg': msg.payload_fields})
-
-    def run(self):
-        self.lora_listener()
+# thread = Thread()
+# thread_stop_event = Event()
+#
+# class Lora(Thread):
+#     def __init__(self):
+#         self.delay = 5
+#         super(Lora, self).__init__()
+#
+#     def lora_listener(self):
+#         print("Started listening...")
+#         app_id = "geoloracja"
+#         access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
+#         handler = ttn.HandlerClient(app_id, access_key)
+#         while not thread_stop_event.isSet():
+#             mqtt_client = handler.data()
+#             mqtt_client.set_uplink_callback(self.uplink_callback)
+#             mqtt_client.connect()
+#             sleep(self.delay)
+#             mqtt_client.close()
+#
+#     def uplink_callback(self, msg, client):
+#         print(msg.payload_fields)
+#         socketio.emit('abc', {'msg': msg.payload_fields})
+#
+#     def run(self):
+#         self.lora_listener()
 
 #Test routes test 123
 

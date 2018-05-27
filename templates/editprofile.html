@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Geoloracja Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet">
+</head>
+
+</html>
+
+<header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <a class="navbar-brand" href="/">
+      <img src="{{ url_for('static', filename='images/geoloracja_logo.png') }}" width="47" height="30" class="d-inline-block align-top" alt="">
+      Geoloracja Dashboard
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('mydevices') }}">Moje urządzenia</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{{ url_for('myprofile') }}">Mój profil</a>
+        </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0">
+        <a class="btn btn-success my-2 my-sm-0" href="{{ url_for('logout') }}">Wyloguj</a>
+      </form>
+    </div>
+  </nav>
+</header>
+
+<body>
+   <div class="container-fluid">
+     <div class="row">
+       <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+         <div class="sidebar-sticky">
+           <ul class="nav flex-column">
+             <li class="nav-item">
+               <a class="nav-link" href="{{ url_for('myprofile') }}">
+                 <span data-feather="home"></span>
+                 Profil <span class="sr-only">(current)</span>
+               </a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link active" href="{{ url_for('editprofile') }}">
+                 <span data-feather="file"></span>
+                 Edytuj profil
+               </a>
+             </li>
+           </ul>
+
+           <!-- <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+             <span>Saved reports</span>
+             <a class="d-flex align-items-center text-muted" href="#">
+               <span data-feather="plus-circle"></span>
+             </a>
+           </h6>
+           <ul class="nav flex-column mb-2">
+             <li class="nav-item">
+               <a class="nav-link" href="#">
+                 <span data-feather="file-text"></span>
+                 Current month
+               </a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="#">
+                 <span data-feather="file-text"></span>
+                 Last quarter
+               </a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="#">
+                 <span data-feather="file-text"></span>
+                 Social engagement
+               </a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="#">
+                 <span data-feather="file-text"></span>
+                 Year-end sale
+               </a>
+             </li>
+           </ul> -->
+         </div>
+       </nav>
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+
+  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" style="margin-top: 4rem;">
+    <h2>Edycja profilu</h2>
+    <hr class="my-4">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class=flashes style="margin-top:20px">
+            {% for message in messages %}
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-5">
+                        <div class="alert alert-danger text-center" role="alert">
+                            {{ message }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    {% block body %}{% endblock %}
+    <form action="/editprofile" method="POST">
+      <div class="form-group">
+        <label for="name">Imię</label>
+        <input type="text" class="form-control" id="name" name="nameField" placeholder="{{user.name}}">
+      </div>
+      <div class="form-group">
+        <label for="surname">Nazwisko</label>
+        <input type="text" class="form-control" id="surname" name="surnameField" placeholder="{{user.surname}}">
+      </div>
+       <div class="form-group">
+        <label for="surname">Telefon</label>
+        <input type="text" class="form-control" id="phone" name="phoneField" placeholder="{{user.phone}}">
+      </div>
+      <button type="submit" class="btn btn-success">Zapisz</button>
+    </form>
+    <hr class="my-4">
+    <br>
+    <h1>Reset hasła</h1>
+      <br>
+    <a class="btn btn-success" href="{{ url_for('password_reset') }}">Zresetuj hasło</a>
+    </div>
+
+
+    </div>
+  </div>
+
+</body>
