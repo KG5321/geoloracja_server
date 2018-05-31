@@ -71,18 +71,36 @@ class Lora(Thread):
         polygon = Polygon([[p.x, p.y] for p in pointList])
         result = polygon.contains(point)
         if result:
-            print('Device in area')
+            print('Device in area')   
 	    if device.status != False :
             	device.status = False
-		db.session.commit() 
+		db.session.commit()
+		app_id = "geoloracja"
+            	access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
+      	    	handler = ttn.HandlerClient(app_id, access_key)
+	    	client = handler.data();
+	    	client.connect();
+	    	payload = "AA=="
+	    	client.send(device.name,payload)
+		 
         else:
             print('Device left area, sending notification')
             findUser = User.query.filter(User.device.contains(device))
             user = findUser.all()[0]
-	    device.status = True
-	    db.session.commit() 
+	    if device.status != True:
+		device.status = True
+	    	db.session.commit()
+	    	app_id = "geoloracja"
+            	access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
+            	handler = ttn.HandlerClient(app_id, access_key)
+	    	client = handler.data();
+	    	client.connect();
+	    	payload = "AQ=="
+	    	client.send(device.name,payload)
             self.sendNotification(user, device)
 	    self.sendSMS(user,device)
+	    
+                
 
     def sendNotification(self, user, device):       
 	email = user.email

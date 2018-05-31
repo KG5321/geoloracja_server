@@ -6,7 +6,7 @@ from flask import render_template, request, url_for, redirect, session, flash, a
 from sqlalchemy import exc
 import itsdangerous, json
 from time import sleep
-import requests
+import ttn
 
 
 @app.route('/', methods = ['GET'])
@@ -139,6 +139,28 @@ def removeDevice(address):
                 db.session.delete(device)
                 db.session.commit()
                 flash(u'Usunięto urządzenie '+device.name)
+                return redirect(url_for('mydevices'))
+        flash(u'Błędne dane!')
+        return redirect(url_for('mydevices'))
+
+@app.route('/requestGPS/<address>')
+def requestGPS(address):
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        currentUser = User.query.get(session['currentUserId'])
+        devices = currentUser.device
+        for device in devices:
+            if device.deviceAddress == address:
+		app_id = "geoloracja"
+        	access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
+        	handler = ttn.HandlerClient(app_id, access_key)
+		client = handler.data();
+		client.connect();
+		payload = "AQ=="
+		client.send(device.name,payload)
+                flash(u'Dane GPS zostaną pobrane przy następnym otrzymanym pakiecie z urządzenia '+device.name)
+		client.close();
                 return redirect(url_for('mydevices'))
         flash(u'Błędne dane!')
         return redirect(url_for('mydevices'))

@@ -110,7 +110,8 @@
                   <th>Nazwa</th>
                   <th>Adres Urządzenia</th>
                   <th>Data ostatniej aktualizacji</th>
-                  <th>Edycja</th>
+		  <th>Pobierz pozycję GPS</th>
+		  <th>Edycja</th>
                 </tr>
               </thead>
                 <tbody>
@@ -130,6 +131,7 @@
                       {% else %}
                         <td>Brak</td>
                       {% endif %}
+		      <td><a class="btn btn-secondary" href="/requestGPS/{{device.deviceAddress}}" style="padding: 0.5% 0;width: 70px;">GPS</a></td>
                       <td><a class="btn btn-success" data-toggle="modal" data-target="#{{device.name}}Modal" style="padding: 0.5% 0; width: 70px; color: #fff;">Edytuj</a></td>
                       <!-- Modal -->
                         <div class="modal fade" id="{{device.name}}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -144,7 +146,7 @@
                               <form action="/editprofile" method="POST">
                               <div class="modal-body">
                                   <div class="form-group">
-                                    <label for="name">Nazwa urządzenia</label>
+                                    <label for="name">Nazwa urządzenia</label
                                     <input type="text" class="form-control" id="name" name="nameField" placeholder="{{device.name}}">
                                   </div>
                                   <div class="form-group">
