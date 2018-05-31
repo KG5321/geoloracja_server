@@ -152,6 +152,8 @@ def requestGPS(address):
         devices = currentUser.device
         for device in devices:
             if device.deviceAddress == address:
+		device.status = True
+		db.session.commit()
 		app_id = "geoloracja"
         	access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
         	handler = ttn.HandlerClient(app_id, access_key)
