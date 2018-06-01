@@ -75,14 +75,7 @@ class Lora(Thread):
 	    if device.status != False :
             	device.status = False
 		db.session.commit()
-		app_id = "geoloracja"
-            	access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
-      	    	handler = ttn.HandlerClient(app_id, access_key)
-	    	client = handler.data();
-	    	client.connect();
-	    	payload = "AA=="
-	    	client.send(device.name,payload)
-		 
+		self.downlink(device,"AA==") 
         else:
             print('Device left area, sending notification')
             findUser = User.query.filter(User.device.contains(device))
@@ -90,13 +83,7 @@ class Lora(Thread):
 	    if device.status != True:
 		device.status = True
 	    	db.session.commit()
-	    	app_id = "geoloracja"
-            	access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
-            	handler = ttn.HandlerClient(app_id, access_key)
-	    	client = handler.data();
-	    	client.connect();
-	    	payload = "AQ=="
-	    	client.send(device.name,payload)
+	    	self.downlink(device,"AQ==")
             self.sendNotification(user, device)
 	    self.sendSMS(user,device)
 	    
@@ -125,6 +112,15 @@ class Lora(Thread):
 	sms_body = "Witaj " + name + " Uzytkownik "+ deviceName +" Opuscil swoj obszar" 
 	xml_req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><request protocol=\"SmesX\" version=\"2.2\" user=\""+sms_sender_name+"\" password=\""+sms_sender_password+"\"><send_sms><msisdn>"+phone+"</msisdn><body>"+sms_body+"</body></send_sms></request>"
 	print requests.post('https://www.smeskom.pl:2200/smesx', data = { 'xml' : xml_req } , verify=False).text
+
+    def downlink(self,device,payload):   
+	app_id = "geoloracja"
+        access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
+        handler = ttn.HandlerClient(app_id, access_key)
+	client = handler.data();
+	client.connect();
+	client.send(device.name,payload)
+	print u'Downlink Sent'
 
 
 # Valid payload data for testing uplink
