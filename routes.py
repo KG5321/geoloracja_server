@@ -53,6 +53,7 @@ def register():
         try:
             db.session.add(newUser)
             db.session.commit()
+            db.session.close()
             token = serializer.dumps(email, salt='email-confirm')
             msg = Message('Zweryfikuj swój email', sender='Geoloracja', recipients=[email])
             link = url_for('confirm_email', token=token, _external=True)
@@ -76,7 +77,12 @@ def confirm_email(token):
         return '<h1>Token wygasł!</h1>'
     userVerified = User.query.filter_by(email=email).first()
     userVerified.isEmailVerified = True
-    db.session.commit()
+    try:
+        db.session.commit()
+        db.session.close()
+    except:
+        db.session.rollback()
+        flash(u'Błąd bazy danych!')
     return redirect(url_for('login'))
 
 @app.route('/passwordreset/<token>', methods = ['GET', 'POST'])
@@ -90,8 +96,13 @@ def password_reset_token(token):
     if request.form['passwordField'] == request.form['password2Field']:
         userResetPassword = User.query.filter_by(email=email).first()
         userResetPassword.passwordHash = userResetPassword.set_password(request.form['passwordField'])
-        db.session.commit()
-        flash(u'Hasło zostało zmienione')
+        try:
+            db.session.commit()
+            db.session.close()
+            flash(u'Hasło zostało zmienione')
+        except:
+            db.session.rollback()
+            flash(u'Błąd bazy danych!')
         return redirect(url_for('logout'))
     else:
         flash(u'Wprowadzone hasła różnią się')
@@ -135,32 +146,16 @@ def removeDevice(address):
         for device in devices:
             if device.deviceAddress == address:
                 currentUser.device.remove(device)
-                db.session.delete(device)
-                db.session.commit()
-                flash(u'Usunięto urządzenie '+device.name)
+                try:
+                    db.session.delete(device)
+                    db.session.commit()
+                    flash(u'Usunięto urządzenie '+device.name)
+                except:
+                    db.session.rollback()
+                    flash(u'Błąd bazy danych!')
                 return redirect(url_for('mydevices'))
         flash(u'Błędne dane!')
         return redirect(url_for('mydevices'))
-
-
-@app.route('/testdelete')
-def testdelete():
-    if not session.get('loggedIn'):
-        return redirect(url_for('login'))
-    else:
-        currentUser = User.query.get(session['currentUserId'])
-        devices = currentUser.device
-        for device in devices:
-            print(device.name)
-        # currentUser.device.remove()
-        for de in devices:
-            if de.name == 'kupa':
-                currentUser.device.remove(de)
-                db.session.commit()
-        # db.session.query(Device).filter_by(name='test1').children.remove()
-        # db.session.delete(device)
-        # db.session.commit()
-        return 'Removed'
 
 @app.route('/newdevice', methods=['GET', 'POST'])
 def newdevice():
@@ -174,9 +169,13 @@ def newdevice():
         currentUser = User.query.get(session['currentUserId'])
         if deviceName and deviceAddress:
             newDevice = Device(deviceAddress,deviceName)
-            db.session.add(newDevice)
-            currentUser.device.append(newDevice)
-            db.session.commit()
+            try:
+                db.session.add(newDevice)
+                currentUser.device.append(newDevice)
+                db.session.commit()
+            except:
+                db.session.rollback()
+                flash(u'Błąd bazy danych!')
             return redirect(url_for('mydevices'))
         else:
             flash(u'Pola nie zostały wypełnione')
@@ -229,18 +228,30 @@ def editprofile():
         if request.form['nameField'] != '' and request.form['surnameField'] != '':
             currentUser.name = request.form['nameField']
             currentUser.surname = request.form['surnameField']
-            db.session.commit()
-            flash(u'Zmieniono imie i nazwisko')
+            try:
+                db.session.commit()
+                flash(u'Zmieniono imie i nazwisko')
+            except:
+                db.session.rollback()
+                flash(u'Błąd bazy danych!')
             return redirect(url_for('editprofile'))
         if request.form['nameField'] != '':
             currentUser.name = request.form['nameField']
-            db.session.commit()
-            flash(u'Zmieniono imię')
+            try:
+                db.session.commit()
+                flash(u'Zmieniono imię')
+            except:
+                db.session.rollback()
+                flash(u'Błąd bazy danych!')
             return redirect(url_for('editprofile'))
         if request.form['surnameField'] != '':
             currentUser.surname = request.form['surnameField']
-            db.session.commit()
-            flash(u'Zmieniono nazwisko')
+            try:
+                db.session.commit()
+                flash(u'Zmieniono nazwisko')
+            except:
+                db.session.rollback()
+                flash(u'Błąd bazy danych!')
             return redirect(url_for('editprofile'))
         return redirect(url_for('editprofile'))
 
@@ -259,10 +270,14 @@ def getcoords(deviceName):
         for device in devices:
             if device.name == deviceName:
                 newArea = Area(coordinatesString)
-                db.session.add(newArea)
-                userDevice = Device.query.filter_by(name=deviceName).first()
-                userDevice.area.append(newArea)
-                db.session.commit()
+                try:
+                    db.session.add(newArea)
+                    userDevice = Device.query.filter_by(name=deviceName).first()
+                    userDevice.area.append(newArea)
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                    flash(u'Błąd bazy danych!') 
         flash(u'Ustawiono nowy obszar dla urzadzenia '+deviceName)
         return 'OK'
 

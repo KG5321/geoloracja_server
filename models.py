@@ -65,6 +65,7 @@ class Device(db.Model):
         self.currentLng = currentLng
         self.lastUpdate = datetime.now()
         db.session.commit()
+        db.session.close()
 
 
 class Area(db.Model):
