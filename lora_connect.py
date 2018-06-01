@@ -7,11 +7,19 @@ from flask_mail import Message
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 import ttn
+from machine_learning.train import loadClassifier
 
 class Lora(Thread):
     def __init__(self):
-        self.delay = 5
         super(Lora, self).__init__()
+        self.delay = 5
+
+        # TODO store classifier in database
+        self.gateways_needed = ['eui-1234567890abcdef', 'eui-1234567891abcdef', 'eui-1234567892abcdef']
+        try:
+            self.classifier = loadClassifier('machine_learning/classifier.pickle.gzip') 
+        except:
+            print("Classifier not found.")
 
     def uplink_listener(self):
         print("Uplink listener is running...")
@@ -26,8 +34,22 @@ class Lora(Thread):
             client.close()
 
     def uplink_callback(self, msg, client):
+        self.predict(msg)
         self.update_device(msg)
 
+    def predict(self, msg): # returns 'out', 'in' or None
+        if self.classifier is not None:
+            try:
+                gateways = msg.metadata.gateways
+                gateways = {gateway.gtw_id: gateway.rssi for gateway in gateways if gateway.gtw_id in self.gateways_needed}
+                sample = [gateways[gtw_id] for gtw_id in self.gateways_needed]
+                # sample = [[-121, -12, -121]] # test valid sample (expected 'out' result)
+                prediction = self.classifier.predict(sample)
+                print ("Predict in area: {}".format(prediction))
+                return prediction
+            except:
+                print ("Not enough gateways for prediction ({})".format(gateways))
+                
     def update_device(self, msg):
         findDevice = Device.query.filter_by(name=msg.dev_id).first()
         if findDevice is not None:
