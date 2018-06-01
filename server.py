@@ -26,7 +26,7 @@ class GeoloracjaModelView(ModelView):
             return currentUser.isAdmin
         return False
 
-    def _handle_view(self, name, **kwargs):
+    def _handle_view(self, name, *args, **kwargs):
         if not self.is_accessible():
             return abort(403)
 

@@ -13,6 +13,21 @@ def index():
         return render_template('main.html')
     else:
         return redirect(url_for('dashboard'))
+@app.before_first_request
+def restrict_admin_url():
+    endpoint = 'admin.index'
+    url = url_for(endpoint)
+    admin_index = app.view_functions.pop(endpoint)
+
+    @app.route(url, endpoint=endpoint)
+    def secure_admin_index():
+        if not session.get('loggedIn'):
+            return abort(404)
+        else:
+            currentUser = User.query.get(session['currentUserId'])
+            if currentUser.isAdmin:
+                return admin_index()
+            return abort(404)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
