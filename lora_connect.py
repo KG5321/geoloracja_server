@@ -18,8 +18,9 @@ class Lora(Thread):
         app_id = "geoloracja"
         access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
         handler = ttn.HandlerClient(app_id, access_key)
-        client = handler.data()
+
         while True:
+            client = handler.data()
             client.set_uplink_callback(self.uplink_callback)
             client.connect()
             sleep(self.delay)
@@ -30,7 +31,6 @@ class Lora(Thread):
 
     def update_device(self, msg):
         findDevice = Device.query.filter_by(name=msg.dev_id).first()
-        db.session.close()
         if findDevice is not None:
             lat = msg.payload_fields.latitude
             lng = msg.payload_fields.longitude
@@ -42,9 +42,9 @@ class Lora(Thread):
                     self.areaCheck(findDevice, coords)
                 except IndexError:
                     print('Area not defined yet, no area check')
-
             else:
                 print("No fix")
+        db.session.close()
 
     def run(self):
         self.uplink_listener()
