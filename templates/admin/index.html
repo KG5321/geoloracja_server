@@ -1,0 +1,17 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+{{ super() }}
+<div class="row-fluid">
+    <h1>Geoloracja Admin Panel</h1>
+    <p class="lead">
+        Zarządzanie bazą danych
+    </p>
+    <p>
+        Karty na pasku nawigacji odpowiadają tabelom w bazie danych
+    </p>
+    <p>
+        Baza danych: PostgreSQL
+    </p>
+    <a class="btn btn-success" href="/"><i class="icon-arrow-left icon-white"></i>Powrót do strony głównej</a>
+</div>
+{% endblock body %}

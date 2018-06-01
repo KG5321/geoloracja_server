@@ -7,7 +7,6 @@ from sqlalchemy import exc
 import itsdangerous, json
 from time import sleep
 
-
 @app.route('/', methods = ['GET'])
 def index():
     if not session.get('loggedIn'):
@@ -277,7 +276,7 @@ def getcoords(deviceName):
                     db.session.commit()
                 except:
                     db.session.rollback()
-                    flash(u'Błąd bazy danych!') 
+                    flash(u'Błąd bazy danych!')
         flash(u'Ustawiono nowy obszar dla urzadzenia '+deviceName)
         return 'OK'
 

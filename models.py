@@ -2,6 +2,7 @@ from server import db, bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from datetime import datetime
 
+
 userDevice = db.Table('userDevice',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
     db.Column('device_id', db.Integer, db.ForeignKey('devices.id'))
