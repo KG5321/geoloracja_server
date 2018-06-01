@@ -1,7 +1,7 @@
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 from sklearn.ensemble import RandomForestClassifier
-import re 
+import re
 import numpy as np
 import gzip
 import pickle 
