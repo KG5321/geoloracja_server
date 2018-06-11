@@ -104,6 +104,7 @@
       <img src="{{ url_for('static', filename='images/user_default.png') }}" class="rounded mx-auto d-block" alt="profile_image">
       <h1 class="display-5" style="padding: 1rem;">{{details['name']}} {{details['surname']}}</h1>
         <p class="lead">Email: {{details['email']}}</p>
+        <p class="lead">Numer telefonu: {{details['phone']}}</p>
     </div>
       {% with messages = get_flashed_messages() %}
           {% if messages %}

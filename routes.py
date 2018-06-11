@@ -4,7 +4,7 @@ from flask_mail import Message
 from models import User, Device, Area
 from flask import render_template, request, url_for, redirect, session, flash, abort, jsonify
 from sqlalchemy import exc
-import itsdangerous, json
+import itsdangerous, json, ttn
 from time import sleep
 
 @app.route('/', methods = ['GET'])
@@ -49,12 +49,6 @@ def login():
     flash(u'Dane są niepoprawne. Spróbuj jeszcze raz.')
     return redirect(url_for('login'))
 
-@app.route('/listener')
-def testing():
-    if not session.get('loggedIn'):
-        return redirect(url_for('login'))
-    else:
-        return render_template('test.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -63,7 +57,7 @@ def register():
     if request.form['passwordField'] == request.form['password2Field']:
         email = request.form['emailField']
         name = request.form['nameField']
-        newUser = User(request.form['nameField'], request.form['surnameField'], request.form['emailField'], request.form['passwordField'], False, False)
+        newUser = User(request.form['nameField'], request.form['surnameField'], request.form['emailField'], request.form['phoneField'], request.form['passwordField'], False, False)
         try:
             db.session.add(newUser)
             db.session.commit()
@@ -195,6 +189,21 @@ def newdevice():
             flash(u'Pola nie zostały wypełnione')
             return render_template('newdevice.html')
 
+@app.route('/downlink/<deviceName>')
+def downlink(deviceName):
+    if not session.get('loggedIn'):
+        return redirect(url_for('login'))
+    else:
+        app_id = "geoloracja"
+        access_key = "ttn-account-v2.cxnYXM8WxBx65iUHiI8KqNcpFFmGKtud5jEU-TtaiAo"
+        handler = ttn.HandlerClient(app_id, access_key)
+        client = handler.data()
+        client.connect()
+        client.send(deviceName,"AQ==")
+        client.close()
+        flash(u'Wysłano zapytanie o obecną lokalizację')
+        return redirect(url_for('mydevices'))
+
 
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
@@ -226,6 +235,7 @@ def myprofile():
         details['name'] = currentUser.name
         details['surname'] = currentUser.surname
         details['email'] = currentUser.email
+        details['phone'] = currentUser.phone
         return render_template('myprofile.html', details=details)
 
 @app.route('/editprofile', methods=['GET', 'POST'])
@@ -236,7 +246,7 @@ def editprofile():
         currentUser = User.query.get(session['currentUserId'])
         if request.method == 'GET':
             return render_template('editprofile.html', user=currentUser)
-        if request.form['nameField'] == '' and request.form['surnameField'] == '':
+        if request.form['nameField'] == '' and request.form['surnameField'] == '' and request.form['phoneField'] == '':
             flash(u'Pola sa puste')
             return redirect(url_for('editprofile'))
         if request.form['nameField'] != '' and request.form['surnameField'] != '':
@@ -263,6 +273,15 @@ def editprofile():
             try:
                 db.session.commit()
                 flash(u'Zmieniono nazwisko')
+            except:
+                db.session.rollback()
+                flash(u'Błąd bazy danych!')
+            return redirect(url_for('editprofile'))
+        if request.form['phoneField'] != '':
+            currentUser.phone = request.form['phoneField']
+            try:
+                db.session.commit()
+                flash(u'Zmieniono numer')
             except:
                 db.session.rollback()
                 flash(u'Błąd bazy danych!')

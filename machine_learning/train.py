@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 import re
 import numpy as np
 import gzip
-import pickle 
+import pickle
 
 def isInArea(p, area_points):
     pattern = re.compile("([0-9.]+)")
@@ -27,7 +27,7 @@ def isInArea(p, area_points):
 
 """
 mote	time	seqNo	data	lat	lon	alt	packet_id	gateway1	snr1_cB	rssi1_dBm	gateway2	snr2_cB	rssi2_dBm	gateway3	snr3_cB	rssi3_dBm
-0       1       2       3       4   5   6   7           8           9       10          11          12      13          14          15      16 
+0       1       2       3       4   5   6   7           8           9       10          11          12      13          14          15      16
 
 z pracy Bartosza Nikodema
 L.p Adres Wspolrzedne geograficzne
@@ -58,7 +58,7 @@ def dumpClassifier(classifier, fname):
     fp = gzip.open(fname, 'wb') # This assumes that primes.data is already packed with gzip
     pickle.dump(classifier, fp)
     fp.close()
- 
+
 def loadClassifier(fname):
     fp = gzip.open(fname, 'rb') # This assumes that primes.data is already packed with gzip
     classifier = pickle.load(fp)
@@ -67,30 +67,26 @@ def loadClassifier(fname):
 
 if __name__ == "__main__":
 
-    sample_area = "[{lat: 51.11023846371978, lng: 17.05868413282974}, {lat: 51.1084062842131, lng: 17.057611249223783}, {lat: 51.107826977050095, lng: 17.06115176512344}, {lat: 51.1089990561194, lng: 17.0616667492543}]" 
+    sample_area = "[{lat: 51.11023846371978, lng: 17.05868413282974}, {lat: 51.1084062842131, lng: 17.057611249223783}, {lat: 51.107826977050095, lng: 17.06115176512344}, {lat: 51.1089990561194, lng: 17.0616667492543}]"
 
     in_area = {"lat": "51.108560", "lng": "17.060121"} # sample known positions
     out_area = {"lat": "51.110584", "lng": "17.060386"} # sample known positions
 
     dataset_fname = "geo_data.csv"
     classifier_fname = "classifier.pickle.gzip"
-    
+
     print ("loading from raw file: " + dataset_fname)
-    
+
     X, y = createDataset(dataset_fname, sample_area)
-    
+
     print ("creating classifier")
-    
+
     classifier, name = trainRandomForest(np.array(X), np.array(y))
-    
+
     dumpClassifier(classifier, classifier_fname)
-    
+
     print ("classifier dumped")
-    
+
     sample = [[-121, -12, -121]]
-    
+
     print ("predict for %s: %s" % (sample, classifier.predict(sample)))
-    
-    
-    
-    

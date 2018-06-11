@@ -21,15 +21,17 @@ class User(db.Model):
     name = db.Column(db.String)
     surname = db.Column(db.String)
     email = db.Column(db.String, unique=True)
+    phone = db.Column(db.String)
     passwordHash = db.Column(db.Binary(60))
     isAdmin = db.Column(db.Boolean, default=False)
     isEmailVerified = db.Column(db.Boolean, default=False)
 
 
-    def __init__(self, name, surname, email, plaintext_password, isAdmin, isEmailVerified):
+    def __init__(self, name, surname, email, phone, plaintext_password, isAdmin, isEmailVerified):
         self.name = name
         self.surname = surname
         self.email = email
+        self.phone = phone
         self.passwordHash = self.set_password(plaintext_password)
         self.isAdmin = isAdmin
         self.isEmailVerified = isEmailVerified
@@ -77,4 +79,15 @@ class Area(db.Model):
     devices = db.relationship('Device', secondary=deviceArea, backref=db.backref('area', lazy='dynamic'))
 
     def __init__(self,coordinatesString):
+        self.coordinatesString = coordinatesString
+
+
+class AdminArea(db.Model):
+
+    __tablename__ = 'adminArea'
+
+    id = db.Column(db.Integer, primary_key=True)
+    coordinatesString = db.Column(db.String)
+
+    def __init__(self, coordinatesString):
         self.coordinatesString = coordinatesString
