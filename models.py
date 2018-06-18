@@ -1,5 +1,4 @@
 from server import db, bcrypt
-from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from datetime import datetime
 
 
@@ -44,8 +43,6 @@ class User(db.Model):
         return bcrypt.check_password_hash(self.passwordHash, plaintext_password)
 
 
-
-
 class Device(db.Model):
 
     __tablename__ = 'devices'
@@ -56,17 +53,21 @@ class Device(db.Model):
     currentLat = db.Column(db.Float)
     currentLng = db.Column(db.Float)
     lastUpdate = db.Column(db.DateTime)
+    prediction = db.Column(db.String)
     users = db.relationship('User', secondary=userDevice, backref=db.backref('device', lazy='dynamic'))
 
     def __init__(self, deviceAddress, name):
         self.deviceAddress = deviceAddress
         self.name = name
 
-
     def set_location(self, currentLat, currentLng):
         self.currentLat = currentLat
         self.currentLng = currentLng
         self.lastUpdate = datetime.now()
+        db.session.commit()
+
+    def set_prediction(self, prediction):
+        self.prediction = prediction
         db.session.commit()
 
 

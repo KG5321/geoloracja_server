@@ -43,7 +43,6 @@
     </div>
   </nav>
 </header>
-
 <body>
    <div class="container-fluid">
      <div class="row">
@@ -63,52 +62,15 @@
                </a>
              </li>
            </ul>
-
-           <!-- <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-             <span>Saved reports</span>
-             <a class="d-flex align-items-center text-muted" href="#">
-               <span data-feather="plus-circle"></span>
-             </a>
-           </h6> -->
-           <!-- <ul class="nav flex-column mb-2">
-             <li class="nav-item">
-               <a class="nav-link" href="#">
-                 <span data-feather="file-text"></span>
-                 Current month
-               </a>
-             </li>
-             <li class="nav-item">
-               <a class="nav-link" href="#">
-                 <span data-feather="file-text"></span>
-                 Last quarter
-               </a>
-             </li>
-             <li class="nav-item">
-               <a class="nav-link" href="#">
-                 <span data-feather="file-text"></span>
-                 Social engagement
-               </a>
-             </li>
-             <li class="nav-item">
-               <a class="nav-link" href="#">
-                 <span data-feather="file-text"></span>
-                 Year-end sale
-               </a>
-             </li>
-           </ul> -->
          </div>
        </nav>
   <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-
   <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
       #map {
         height: 100%px;
       }
     </style>
-
   <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3" style="margin-top: 4rem;">
             {% with messages = get_flashed_messages() %}
@@ -129,8 +91,18 @@
                 {% endif %}
               {% endwith %}
             {% block body %}{% endblock %}
-            <h1>Predykcja obszaru na podstawie LoRa</h1>
-            <h4>Status: Poza obszarem</h4>
+            <h2>Predykcja obszaru na podstawie LoRa</h2>
+            {% for device in devices %}
+              {% if device.prediction == None %}
+                <h5>Status urządzenia {{ device.name }}: Niewystarczające dane</h5>
+              {% endif %}
+              {% if device.prediction == 'out' %}
+                <h5>Status urządzenia {{ device.name }}: Poza obszarem</h5>
+              {% endif %}
+              {% if device.prediction == 'in' %}
+                <h5>Status urządzenia {{ device.name }}: W obszarze</h5>
+              {% endif %}
+            {% endfor %}
             <hr class="my-4">
             <h2>Lokalizacja urządzeń na podstawie GPS</h2>
             <div id="map" style="height:700px;"></div>
@@ -160,23 +132,6 @@
                       {{ device.name }}Area.setMap(map);
                     {% endif %}
                   {% endfor %}
-
-                  // var content = '<div id="content">'+
-                  //       '<div id="siteNotice">'+
-                  //       '</div>'+
-                  //       '<h1 id="firstHeading" class="firstHeading">obrszar</h1>'+
-                  //       '<div id="bodyContent">'+
-                  //       '<p>Twoje urządzenie <b>obszar</b> znajduje się w tej lokalizacji.</p>' +
-                  //       '</div>'+
-                  //       '</div>';
-                  // var infWindow = new google.maps.InfoWindow({
-                  //   content: content
-                  // });
-
-                  // bermudaTriangle.addListener('click', function(){
-                  //   infWindow.open(map, bermudaTriangle)
-                  // });
-
                   var icon = {
                       url: "{{ url_for('static', filename='images/pin_medium.png') }}", // url
                       //scaledSize: new google.maps.Size(25, 39.5), // scaled size
@@ -210,18 +165,10 @@
                     {% endif %}
                   {% endfor %}
                 }
+                // window.location.reload(true);
               </script>
               <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaw3kCuHb1rRCMMMkxxsmpLB8kRwIKSfs&callback=initMap&libraries=drawing"
               async defer></script>
-
-
-            <!-- <div class="jumbotron jumbotron-fluid">
-              <div class="container">
-                <h1 class="display-4">Tu będzie mapa</h1>
-                <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
-              </div>
-            </div> -->
-
           </div>
     </div>
   </div>

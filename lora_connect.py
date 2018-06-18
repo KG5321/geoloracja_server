@@ -35,19 +35,22 @@ class Lora(Thread):
         self.update_device(msg)
 
     def predict(self, msg): # returns 'out', 'in' or None
-        try:
-            gateways = msg.metadata.gateways
-            gateways = {gateway.gtw_id: gateway.rssi for gateway in gateways if gateway.gtw_id in self.gateways_needed}
-            sample = [gateways[gtw_id] for gtw_id in self.gateways_needed]
-            # sample = [[-121, -12, -121]] # test valid sample (expected 'out' result)
-            prediction = self.classifier.predict(sample)
-            print ("Predict in area: {}".format(prediction))
-            return prediction
-        except:
+        findDevice = Device.query.filter_by(name=msg.dev_id).first()
+        if findDevice is not None:
             try:
-                print ("Not enough gateways for prediction ({})".format(gateways))
+                gateways = msg.metadata.gateways
+                gateways = {gateway.gtw_id: gateway.rssi for gateway in gateways if gateway.gtw_id in self.gateways_needed}
+                sample = [gateways[gtw_id] for gtw_id in self.gateways_needed]
+                # sample = [[-121, -12, -121]] # test valid sample (expected 'out' result)
+                prediction = self.classifier.predict(sample)
+                print ("Predict in area: {}".format(prediction))
+                findDevice.set_prediction(prediction)
             except:
-                print("No gateways (probably simulated uplink)")
+                try:
+                    print ("Not enough gateways for prediction ({})".format(gateways))
+                except:
+                    print("No gateways (probably simulated uplink)")
+        db.session.close()
 
     def update_device(self, msg):
         findDevice = Device.query.filter_by(name=msg.dev_id).first()
