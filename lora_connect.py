@@ -14,7 +14,7 @@ class Lora(Thread):
         super(Lora, self).__init__()
         self.delay = 5
         # TODO store classifier in database
-        self.gateways_needed = ['eui-1234567890abcdef', 'eui-1234567891abcdef', 'eui-1234567892abcdef']
+        self.gateways_needed = [u'eui-1234567890abcdef', u'eui-1234567891abcdef', u'eui-1234567892abcdef']
         self.classifier = loadClassifier('machine_learning/classifier.pickle.gzip')
 
     def uplink_listener(self):
@@ -40,11 +40,13 @@ class Lora(Thread):
             try:
                 gateways = msg.metadata.gateways
                 gateways = {gateway.gtw_id: gateway.rssi for gateway in gateways if gateway.gtw_id in self.gateways_needed}
-                sample = [gateways[gtw_id] for gtw_id in self.gateways_needed]
+                print(gateways)
+                print(self.gateways_needed)
+                sample = [[gateways[gtw_id] for gtw_id in self.gateways_needed]]
                 # sample = [[-121, -12, -121]] # test valid sample (expected 'out' result)
                 prediction = self.classifier.predict(sample)
                 print ("Predict in area: {}".format(prediction))
-                findDevice.set_prediction(prediction)
+                findDevice.set_prediction(prediction[0])
             except:
                 try:
                     print ("Not enough gateways for prediction ({})".format(gateways))
