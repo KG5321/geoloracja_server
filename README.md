@@ -2,13 +2,13 @@
 
 Server created for team project called "GeoLoRacja"
 
-## Frameworks:
+## Frameworks
 
 - Flask
 - Bootstrap
 - SQLAlchemy
 
-## Database:
+## Database
 
 - PostrgreSQL
 
@@ -19,19 +19,19 @@ Server created for team project called "GeoLoRacja"
 
 ## Instalation
 
-###### Step 1 - Installing all needed packages.
+##### Step 1 - Installing all needed packages.
 
 To install all packages, run:
 
 `$ pip install -r requirements.txt`
 
-###### Step 2 - Training classifier.
+##### Step 2 - Training classifier.
 
 Go to folder `machine_learning` by typing `$ cd machine_learning` then run:
 
 `$ python train.py`
 
-###### Step 3 - Installing PostrgreSQL and configuring database.
+##### Step 3 - Installing PostrgreSQL and configuring database.
 
 1. Install PostrgreSQL for Your operating system, You can download it from this link:
 
@@ -56,7 +56,7 @@ Go to folder `machine_learning` by typing `$ cd machine_learning` then run:
 
  `psql=# grant all privileges on database loradb to loradb;`
 
-###### Step 4 - Initialize database.
+##### Step 4 - Initialize database.
 In project folder start python console by typing:
 
 `$ python`
