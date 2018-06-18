@@ -118,7 +118,7 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-md-10 col-md-offset-5">
-                                <div class="alert alert-danger text-center" role="alert">
+                                <div class="alert alert-success text-center" role="alert">
                                     {{ message }}
                                 </div>
                             </div>
@@ -129,6 +129,10 @@
                 {% endif %}
               {% endwith %}
             {% block body %}{% endblock %}
+            <h1>Predykcja obszaru na podstawie LoRa</h1>
+            <h4>Status: Poza obszarem</h4>
+            <hr class="my-4">
+            <h2>Lokalizacja urządzeń na podstawie GPS</h2>
             <div id="map" style="height:700px;"></div>
               <script>
                 var map;
@@ -219,8 +223,6 @@
             </div> -->
 
           </div>
-          <div id="coord"></div>
-
     </div>
   </div>
 

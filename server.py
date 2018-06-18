@@ -36,6 +36,7 @@ from models import User, Device, Area
 
 admin.add_view(GeoloracjaModelView(User, db.session))
 admin.add_view(GeoloracjaModelView(Device, db.session))
+# admin.add_view(GeoloracjaModelView(Area, db.session))
 
 
 if __name__ == '__main__':

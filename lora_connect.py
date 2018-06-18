@@ -13,10 +13,9 @@ class Lora(Thread):
     def __init__(self):
         super(Lora, self).__init__()
         self.delay = 5
-
         # TODO store classifier in database
         self.gateways_needed = ['eui-1234567890abcdef', 'eui-1234567891abcdef', 'eui-1234567892abcdef']
-        # self.classifier = loadClassifier('machine_learning/classifier.pickle.gzip')
+        self.classifier = loadClassifier('machine_learning/classifier.pickle.gzip')
 
     def uplink_listener(self):
         print("Uplink listener is running...")
@@ -32,7 +31,7 @@ class Lora(Thread):
             client.close()
 
     def uplink_callback(self, msg, client):
-        #self.predict(msg)
+        self.predict(msg)
         self.update_device(msg)
 
     def predict(self, msg): # returns 'out', 'in' or None
@@ -45,7 +44,10 @@ class Lora(Thread):
             print ("Predict in area: {}".format(prediction))
             return prediction
         except:
-            print ("Not enough gateways for prediction ({})".format(gateways))
+            try:
+                print ("Not enough gateways for prediction ({})".format(gateways))
+            except:
+                print("No gateways (probably simulated uplink)")
 
     def update_device(self, msg):
         findDevice = Device.query.filter_by(name=msg.dev_id).first()
@@ -113,11 +115,10 @@ class Lora(Thread):
 
     def sendSMS(self, user, device):
         phone = user.phone
-        print("-----------------USER PHONE "+phone)
         deviceName = device.name
         name = user.name
-        sms_sender_name = 'htguser14458'
-        sms_sender_password = 'GkYEyKhT'
+        sms_sender_name = 'htguser14459'
+        sms_sender_password = 'ntKgolY9'
         sms_body = "Witaj " + name + " twoje urzadzenie "+ deviceName +" opuscilo okreslony przez Ciebie obszar"
         xml_req = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><request protocol=\"SmesX\" version=\"2.2\" user=\""+sms_sender_name+"\" password=\""+sms_sender_password+"\"><send_sms><msisdn>"+phone+"</msisdn><body>"+sms_body+"</body></send_sms></request>"
         resp = requests.post('https://www.smeskom.pl:2200/smesx', data = { 'xml' : xml_req } , verify=False)
