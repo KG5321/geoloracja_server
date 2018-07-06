@@ -17,6 +17,10 @@ Server created for team project called "GeoLoRacja"
 - **Dominik Hofman**
 - **Konrad Gebler**
 
+## Disclaimer
+
+IMPORTANT - Repository does not have training data included.
+
 ## Instalation
 
 ##### Step 1 - Installing all needed packages.
