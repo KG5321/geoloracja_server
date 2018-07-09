@@ -20,6 +20,7 @@ Server created for team project called "GeoLoRacja"
 ## Disclaimer
 
 IMPORTANT - Repository does not have training data included.
+Also You have to set Your own secret key in config.cfg, email and email password.
 
 ## Instalation
 
